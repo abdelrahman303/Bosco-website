@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==============================
+   THEME TOKENS
+============================== */
+
+:root {
+  color-scheme: light;
+  --bg: #f4f3f0;
+  --surface: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.72);
+  --border: rgba(15, 23, 42, 0.12);
+  --text: #0f172a;
+  --text-soft: #334155;
+  --text-muted: #64748b;
+  --brand: #c63637;
+  --brand-soft: rgba(198, 54, 55, 0.22);
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #080808;
+  --surface: #111625;
+  --surface-soft: rgba(17, 22, 37, 0.72);
+  --border: rgba(148, 163, 184, 0.24);
+  --text: #e2e8f0;
+  --text-soft: #cbd5e1;
+  --text-muted: #94a3b8;
+  --brand: #df5354;
+  --brand-soft: rgba(223, 83, 84, 0.22);
+}
