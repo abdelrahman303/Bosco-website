@@ -8,7 +8,9 @@
     "dev:web": "vite",
     "server": "node --env-file=.env --experimental-sqlite server/index.js",
     "start": "node --experimental-sqlite server/index.js",
+    "export:api": "node --experimental-sqlite scripts/export-static-api.js",
     "build": "vite build",
+    "build:pages": "npm run export:api && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
