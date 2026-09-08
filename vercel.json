@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "echo skip-frontend-build",
+  "installCommand": "npm ci",
+  "env": {
+    "NODE_OPTIONS": "--experimental-sqlite"
+  },
+  "rewrites": [
+    { "source": "/uploads/:path*", "destination": "/api/uploads/:path*" }
+  ]
+}

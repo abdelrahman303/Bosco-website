@@ -5,8 +5,9 @@ import { DatabaseSync } from 'node:sqlite';
 import bcrypt from 'bcryptjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dataDir = path.join(__dirname, 'data');
-const uploadDir = path.join(__dirname, 'uploads');
+const isServerless = Boolean(process.env.VERCEL);
+const dataDir = isServerless ? path.join('/tmp', 'bosco-data') : path.join(__dirname, 'data');
+const uploadDir = isServerless ? path.join('/tmp', 'bosco-uploads') : path.join(__dirname, 'uploads');
 
 fs.mkdirSync(dataDir, { recursive: true });
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -14,7 +15,7 @@ fs.mkdirSync(uploadDir, { recursive: true });
 export const UPLOAD_DIR = uploadDir;
 
 const db = new DatabaseSync(path.join(dataDir, 'bosco.db'));
-db.exec('PRAGMA journal_mode = WAL');
+if (!isServerless) db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
 
 db.exec(`

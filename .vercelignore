@@ -1,0 +1,8 @@
+dist
+src
+public
+index.html
+*.md
+server/data
+server/uploads
+.env
