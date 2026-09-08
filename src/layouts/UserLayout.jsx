@@ -20,7 +20,7 @@ export default function UserLayout() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-bosco-dark text-bosco-gray dark:text-gray-200 font-sans transition-colors duration-300">
       <UserNavbar />
-      <main className="min-h-screen page-transition overflow-x-hidden">
+      <main className="min-h-screen page-transition">
         <Outlet />
       </main>
       <UserFooter />

@@ -31,3 +31,68 @@
   --brand: #df5354;
   --brand-soft: rgba(223, 83, 84, 0.22);
 }
+
+.admin-input {
+  @apply w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f0f0f] px-4 py-3.5 outline-none focus:border-[#C63637] focus:ring-4 focus:ring-[#C63637]/10 transition-all;
+}
+
+.admin-primary {
+  @apply inline-flex items-center gap-2 bg-[#C63637] text-white px-5 py-3 rounded-2xl font-bold shadow-lg shadow-[#C63637]/20 disabled:opacity-60;
+}
+
+.admin-icon-btn {
+  @apply w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:bg-[#C63637] hover:text-white transition-colors;
+}
+
+.admin-card {
+  @apply bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/5 rounded-[28px] p-6;
+}
+
+html[dir="rtl"] body {
+  font-family: Cairo, Inter, sans-serif;
+}
+
+html[dir="rtl"] .admin-input,
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: right;
+}
+
+html,
+body {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .admin-card {
+    @apply rounded-[20px] p-4;
+  }
+
+  .admin-input {
+    @apply px-3 py-3 text-[16px];
+  }
+}
+
+@keyframes bosco-pump {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 10px 28px rgba(198, 54, 55, 0.28);
+  }
+  50% {
+    transform: scale(1.045);
+    box-shadow: 0 16px 40px rgba(198, 54, 55, 0.48);
+  }
+}
+
+.btn-pump {
+  animation: bosco-pump 2.1s ease-in-out infinite;
+  will-change: transform;
+}
+
+.btn-pump:hover,
+.btn-pump:focus-visible {
+  animation-play-state: paused;
+  transform: scale(1.05);
+}

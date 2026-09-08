@@ -1,65 +1,158 @@
+import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiFacebook, FiYoutube } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FiArrowUpRight, FiFacebook, FiLinkedin, FiMail, FiMapPin, FiPhone, FiYoutube } from 'react-icons/fi';
+import Logo from './Logo';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const socials = [
+  { href: 'https://www.linkedin.com', icon: FiLinkedin, label: 'LinkedIn' },
+  { href: 'https://www.facebook.com', icon: FiFacebook, label: 'Facebook' },
+  { href: 'https://www.youtube.com', icon: FiYoutube, label: 'YouTube' },
+];
 
 export default function UserFooter() {
+  const { t } = useTranslation();
+  const footerRef = useRef(null);
+  const solutions = [
+    { to: '/categories', label: t('site.footer.allCats') },
+    { to: '/products', label: t('site.footer.catalog') },
+    { to: '/quote', label: t('site.footer.quote') },
+    { to: '/contact', label: t('site.footer.talk') },
+  ];
+  const company = [
+    { to: '/aboutus', label: t('site.footer.about') },
+    { to: '/products', label: t('site.footer.featured') },
+    { to: '/categories', label: t('site.footer.domains') },
+    { to: '/contact', label: t('site.footer.contact') },
+  ];
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.footer-reveal',
+        { y: 40 },
+        {
+          y: 0,
+          duration: 0.9,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top 88%',
+            once: true,
+          },
+        }
+      );
+    }, footerRef);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <footer className="bg-bosco-gray dark:bg-[#0a0a0a] text-gray-300 pt-16 pb-8 border-t-[4px] border-bosco-red transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          
-          {/* Brand Info */}
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white">
-              Bosco <span className="text-bosco-red">International Trade</span>
-            </h3>
-            <p className="text-sm text-gray-400">
-              Leading provider of industrial packaging, filling machines, and raw materials across Egypt and the Middle East.
+    <footer ref={footerRef} className="relative overflow-hidden bg-[#070707] text-gray-300">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-24 start-1/4 w-[280px] sm:w-[420px] h-[280px] sm:h-[420px] bg-[#C63637]/15 blur-[140px] rounded-full" />
+      </div>
+
+      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 pt-7 sm:pt-16 lg:pt-20">
+        <div className="footer-reveal rounded-[18px] sm:rounded-[32px] border border-white/10 bg-white/5 backdrop-blur-xl px-4 sm:px-10 py-5 sm:py-10 lg:py-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8">
+          <div className="max-w-2xl text-center sm:text-start">
+            <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.28em] text-[#C63637] mb-1.5 sm:mb-3">{t('site.footer.next')}</p>
+            <h2 className="text-xl sm:text-5xl font-black tracking-tight text-white leading-[1.1]">
+              {t('site.footer.cta')}
+            </h2>
+          </div>
+          <Link
+            to="/quote"
+            className="btn-pump inline-flex items-center justify-center gap-2 bg-[#C63637] text-white px-5 py-2.5 sm:px-7 sm:py-4 rounded-full text-sm sm:text-base font-bold shrink-0"
+          >
+            {t('site.footer.quote')} <FiArrowUpRight />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 xl:grid-cols-12 gap-6 sm:gap-12 py-7 sm:py-16 lg:py-20">
+          <div className="footer-reveal col-span-2 xl:col-span-5 space-y-3 sm:space-y-6">
+            <Logo onDark />
+            <p className="hidden sm:block text-gray-400 max-w-md leading-relaxed">
+              {t('site.footer.blurb')}
             </p>
-            <div className="flex space-x-4 pt-2">
-              <a href="#" className="hover:text-bosco-red transition-colors"><FiLinkedin size={20} /></a>
-              <a href="#" className="hover:text-bosco-red transition-colors"><FiFacebook size={20} /></a>
-              <a href="#" className="hover:text-bosco-red transition-colors"><FiYoutube size={20} /></a>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {socials.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white hover:bg-[#C63637] hover:border-[#C63637] transition-colors"
+                  >
+                    <Icon size={16} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Industrial Solutions</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/packaging" className="hover:text-bosco-red transition-colors">Packaging Machines</Link></li>
-              <li><Link to="/filling" className="hover:text-bosco-red transition-colors">Filling Machines</Link></li>
-              <li><Link to="/production-lines" className="hover:text-bosco-red transition-colors">Complete Production Lines</Link></li>
-              <li><Link to="/spare-parts" className="hover:text-bosco-red transition-colors">Spare Parts & Maintenance</Link></li>
+          <div className="footer-reveal xl:col-span-2">
+            <h3 className="text-white font-black mb-3 sm:mb-5 text-[11px] sm:text-sm uppercase tracking-[0.2em]">{t('site.footer.solutions')}</h3>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+              {solutions.map((item) => (
+                <li key={item.label}>
+                  <Link to={item.to} className="text-gray-400 hover:text-white transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Company */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="hover:text-bosco-red transition-colors">About Bosco</Link></li>
-              <li><Link to="/certifications" className="hover:text-bosco-red transition-colors">Certifications</Link></li>
-              <li><Link to="/careers" className="hover:text-bosco-red transition-colors">Careers</Link></li>
-              <li><Link to="/news" className="hover:text-bosco-red transition-colors">Industry News</Link></li>
+          <div className="footer-reveal xl:col-span-2">
+            <h3 className="text-white font-black mb-3 sm:mb-5 text-[11px] sm:text-sm uppercase tracking-[0.2em]">{t('site.footer.company')}</h3>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+              {company.map((item) => (
+                <li key={item.label}>
+                  <Link to={item.to} className="text-gray-400 hover:text-white transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Contact Us</h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-3"><FiMapPin className="text-bosco-red" /> Alexandria, Egypt</li>
-              <li className="flex items-center gap-3"><FiPhone className="text-bosco-red" /> +20 100 000 0000</li>
-              <li className="flex items-center gap-3"><FiMail className="text-bosco-red" /> sales@bosco-trade.com</li>
-            </ul>
+          <div className="footer-reveal col-span-2 xl:col-span-3 space-y-2 sm:space-y-4">
+            <h3 className="text-white font-black mb-3 sm:mb-5 text-[11px] sm:text-sm uppercase tracking-[0.2em]">{t('site.footer.desk')}</h3>
+            <a href="https://maps.google.com/?q=Alexandria,Egypt" className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
+              <FiMapPin className="text-[#C63637] mt-0.5 shrink-0" /> {t('site.footer.city')}
+            </a>
+            <a href="tel:+201000000000" className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
+              <FiPhone className="text-[#C63637] shrink-0" /> +20 100 000 0000
+            </a>
+            <a href="mailto:sales@bosco-trade.com" className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
+              <FiMail className="text-[#C63637] shrink-0" /> sales@bosco-trade.com
+            </a>
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Bosco International Trade. All rights reserved.</p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white">Terms of Service</Link>
+        <p className="footer-reveal pointer-events-none select-none hidden sm:block text-[18vw] leading-none font-black tracking-tighter text-white/[0.04] text-center -mb-6">
+          BOSCO
+        </p>
+
+        <div className="footer-reveal border-t border-white/10 py-4 sm:py-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] sm:text-sm text-gray-500">
+          <p className="text-center">{t('site.footer.rights', { year: new Date().getFullYear() })}</p>
+          <div className="relative z-20 flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+            <Link to="/privacy" className="hover:text-white">{t('site.footer.privacy')}</Link>
+            <Link to="/terms" className="hover:text-white">{t('site.footer.terms')}</Link>
+            <Link
+              to="/admin/login"
+              className="relative z-30 text-[11px] font-bold text-gray-300 hover:text-white underline-offset-4 hover:underline pointer-events-auto"
+            >
+              {t('site.footer.admin')}
+            </Link>
           </div>
         </div>
       </div>
