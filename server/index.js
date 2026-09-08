@@ -18,12 +18,37 @@ import inquiryRoutes from './routes/inquiries.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = new Hono();
 const PORT = Number(process.env.PORT || 4000);
+const HOST = process.env.HOST || '0.0.0.0';
+
+const extraOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+function corsOrigin(origin) {
+  if (!origin) return origin;
+  const allowed = new Set([
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://rana-fathi-m.github.io',
+    'https://abdelrahman303.github.io',
+    ...extraOrigins,
+  ]);
+  if (allowed.has(origin)) return origin;
+  try {
+    const host = new URL(origin).hostname;
+    if (host.endsWith('.github.io')) return origin;
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 app.use('*', logger());
 app.use(
   '*',
   cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: corsOrigin,
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
   })
@@ -85,7 +110,7 @@ app.onError((error, c) => {
   return c.json({ message: error.message || 'Unexpected server error.' }, 500);
 });
 
-serve({ fetch: app.fetch, port: PORT, hostname: '127.0.0.1' }, (info) => {
-  console.log(`Bosco API running at http://127.0.0.1:${info.port}`);
+serve({ fetch: app.fetch, port: PORT, hostname: HOST }, (info) => {
+  console.log(`Bosco API running at http://${HOST}:${info.port}`);
   console.log(`Catalog data seeded at ${path.join(__dirname, 'data', 'bosco.db')}`);
 });

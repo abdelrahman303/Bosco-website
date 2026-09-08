@@ -3,6 +3,13 @@ const FALLBACK_IMAGE =
 
 export function mediaUrl(url) {
   if (!url) return FALLBACK_IMAGE;
+  if (/^https?:\/\//i.test(url) || url.startsWith('data:')) return url;
+
+  const api = import.meta.env.VITE_API_URL || '/api';
+  const origin = api.replace(/\/?api\/?$/, '');
+  if (url.startsWith('/') && /^https?:\/\//i.test(origin)) {
+    return `${origin}${url}`;
+  }
   return url;
 }
 

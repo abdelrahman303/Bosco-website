@@ -27,7 +27,13 @@ upload.post('/', requireAdmin, async (c) => {
   const buffer = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(filepath, buffer);
 
-  return c.json({ url: `/uploads/${filename}` });
+  const fromEnv = (process.env.PUBLIC_BASE_URL || '').replace(/\/$/, '');
+  const proto = c.req.header('x-forwarded-proto') || 'https';
+  const host = c.req.header('x-forwarded-host') || c.req.header('host') || '';
+  const origin = fromEnv || (host ? `${proto}://${host}` : '');
+  const url = origin ? `${origin}/uploads/${filename}` : `/uploads/${filename}`;
+
+  return c.json({ url });
 });
 
 export default upload;
