@@ -6,13 +6,14 @@
     "products": "Products",
     "contact": "Contact",
     "quote": "Get Quote",
-    "search": "Search"
+    "search": "Search",
+    "closeMenu": "Close menu"
   },
   "admin": {
-    "brand": "Admin",
+    "brand": "Brand",
     "loginTitle": "Admin Console",
     "loginSubtitle": "Manage categories, machinery, and the live catalog.",
-    "email": "Email",
+    "emailLabel": "Email",
     "password": "Password",
     "signIn": "Sign in",
     "signingIn": "Signing in...",
@@ -26,12 +27,48 @@
     "manageAll": "Manage all",
     "catalog": "Catalog",
     "sales": "Sales",
+    "menu": "Menu",
+    "itemsCount": "{{count}} items",
+    "emptyProducts": "No products yet",
+    "emptyProductsHint": "Add your first machine or material to the live catalog.",
+    "emptyCategories": "No categories yet",
+    "emptyCategoriesHint": "Create a category, then add subcategories and products.",
+    "emptySubcategories": "No subcategories yet",
+    "emptySubcategoriesHint": "Create a subcategory under a parent category.",
     "dashboard": "Dashboard",
     "categories": "Categories",
     "subcategories": "Subcategories",
     "products": "Products",
     "addProduct": "Add product",
     "inquiries": "Inquiries",
+    "quotes": {
+      "menu": "Quotes",
+      "eyebrow": "Sales pipeline",
+      "title": "Quote Requests",
+      "subtitle": "Every customer quote with full product details — also emailed to bosco.intertrade@outlook.com.",
+      "search": "Search customer, email, product, SKU...",
+      "empty": "No quote requests yet.",
+      "customer": "Customer",
+      "message": "Customer message",
+      "productDetails": "Requested product",
+      "general": "General quote request",
+      "noProduct": "This request was not linked to a specific product.",
+      "viewProduct": "Open product page",
+      "statusUpdated": "Quote status updated",
+      "filter": {
+        "all": "All",
+        "new": "New",
+        "reviewed": "Reviewed",
+        "contacted": "Contacted",
+        "closed": "Closed"
+      },
+      "status": {
+        "new": "New",
+        "reviewed": "Reviewed",
+        "contacted": "Contacted",
+        "closed": "Closed"
+      }
+    },
     "stats": {
       "categories": "Categories",
       "subcategories": "Subcategories",
@@ -49,7 +86,14 @@
     "saveSubcategory": "Save subcategory",
     "saving": "Saving...",
     "name": "Name",
+    "nameAr": "Name (Arabic)",
     "description": "Description",
+    "descriptionAr": "Description (Arabic)",
+    "shortDescription": "Short description",
+    "shortDescriptionAr": "Short description (Arabic)",
+    "fullDescription": "Full description",
+    "fullDescriptionAr": "Full description (Arabic)",
+    "bilingualHint": "Fill both English and Arabic so the catalog switches with the site language.",
     "icon": "Icon",
     "sortOrder": "Sort order",
     "showHomepage": "Show on homepage",
@@ -92,7 +136,6 @@
     "commercial": "Commercial",
     "currency": "Currency",
     "priceOnRequest": "Price on request",
-    "brand": "Brand",
     "origin": "Origin",
     "technical": "Technical",
     "capacity": "Capacity",
@@ -101,8 +144,6 @@
     "warranty": "Warranty",
     "model": "Model",
     "sku": "SKU",
-    "shortDescription": "Short description",
-    "fullDescription": "Full description",
     "label": "Label",
     "value": "Value",
     "feature": "Feature",
@@ -152,6 +193,63 @@
       "urlToggle": "Or paste an image link",
       "urlPlaceholder": "https://...",
       "success": "Photo uploaded"
+    },
+    "email": {
+      "menu": "Email Services",
+      "eyebrow": "Communications",
+      "title": "Email Services",
+      "subtitle": "Compose and send professional emails from bosco.intertrade@outlook.com with live preview and delivery history.",
+      "refresh": "Refresh status",
+      "from": "From",
+      "smtpStatus": "Mail status",
+      "ready": "Ready to send",
+      "checkCredentials": "Configured — verify credentials",
+      "notConfigured": "Not configured",
+      "security": "Security",
+      "securityHint": "Free Brevo SMTP (or Resend / Graph)",
+      "envHint": "Easiest free setup: create a Brevo account, verify bosco.intertrade@outlook.com, paste BREVO_SMTP_KEY into .env, restart the API. Outlook.com SMTP passwords no longer work.",
+      "compose": "Compose email",
+      "composeHint": "Enter recipient, subject, and message. The branded Bosco template is applied automatically.",
+      "to": "Recipient email",
+      "toHint": "The primary inbox that will receive this email.",
+      "cc": "CC (optional)",
+      "ccHint": "Optional copy recipient.",
+      "recipientName": "Recipient name",
+      "recipientHint": "Used in the greeting line of the email.",
+      "recipientPlaceholder": "e.g. Ahmed Hassan",
+      "subject": "Subject",
+      "subjectPlaceholder": "What is this email about?",
+      "content": "Message content",
+      "contentHint": "{{count}} characters · write clear professional copy",
+      "contentPlaceholder": "Write your message here...",
+      "templates": "Quick templates",
+      "template": {
+        "intro": "Introduction",
+        "quote": "Quotation",
+        "followup": "Follow-up"
+      },
+      "send": "Send email",
+      "sending": "Sending...",
+      "sent": "Email sent successfully",
+      "resent": "Email resent successfully",
+      "resend": "Resend",
+      "resending": "Resending...",
+      "showPreview": "Show preview",
+      "hidePreview": "Hide preview",
+      "livePreview": "Live email preview",
+      "previewSubject": "Your subject will appear here",
+      "previewBody": "Your message content will appear here.",
+      "dearName": "Dear {{name}},",
+      "dearGeneric": "Hello,",
+      "regards": "Warm regards,",
+      "footer": "© Bosco International Trade · Industrial machinery, materials & global supply",
+      "history": "All sent emails",
+      "historyHint": "Latest delivery attempts from this admin panel.",
+      "noHistory": "No emails sent yet.",
+      "viewAll": "View all",
+      "allHistoryTitle": "Sent emails",
+      "allHistoryHint": "Full delivery history with resend for every message.",
+      "backToCompose": "Back to compose"
     }
   },
   "theme": {
@@ -163,7 +261,9 @@
     "common": {
       "loading": "Loading...",
       "products": "Products",
+      "categories": "Categories",
       "category": "Category",
+      "subcategory": "Subcategory",
       "allProducts": "All products",
       "requestQuote": "Request a quote",
       "sending": "Sending...",
@@ -180,130 +280,210 @@
       "warranty": "Warranty"
     },
     "hero": {
-      "badge": "Industry Leading Solutions",
-      "explore": "Explore Our Solutions",
-      "learnMore": "Learn More",
-      "trusted": "Trusted by Global Factories",
-      "live": "Live Monitoring Active",
+      "badge": "Bosco International Trade · Food & Pharma",
+      "explore": "Explore catalog",
+      "learnMore": "Request a quote",
+      "trusted": "Built for regulated production plants",
+      "live": "Machinery and raw materials — one trading partner for factory owners.",
       "slides": [
         {
-          "title1": "Next-Gen",
-          "title2": "Packaging",
-          "title3": "Filling Lines",
-          "desc": "Explore how Bosco International Trade is transforming factory operations with cutting-edge machinery, premium raw materials, and automated solutions.",
-          "statLabel": "Factories transformed across the region.",
-          "badge": "System Calibrated",
-          "features": ["Automated Lines", "Premium Materials", "Higher Yields"]
+          "title1": "Machinery",
+          "title2": "for Food",
+          "title3": "& Pharma",
+          "desc": "Production machinery for pharmaceutical and food factories — filling, packaging, and process lines owners can specify with confidence."
         },
         {
-          "title1": "Premium",
-          "title2": "Raw",
-          "title3": "Materials",
-          "desc": "Sourcing the highest quality industrial materials to ensure your production lines operate at peak efficiency.",
-          "statLabel": "Tons of materials delivered annually.",
-          "badge": "Quality Assured",
-          "features": ["Sourcing", "Quality Control", "Global Supply"]
+          "title1": "Raw",
+          "title2": "Materials",
+          "title3": "Supply",
+          "desc": "Certified raw materials for pharmaceutical and food factories — ingredients and inputs sourced for quality, traceability, and continuity."
         },
         {
-          "title1": "Smart",
+          "title1": "One",
+          "title2": "Partner",
+          "title3": "Two Pillars",
+          "desc": "Bosco connects business owners to machinery and raw materials under one industrial partner — clearer decisions, stronger plants."
+        },
+        {
+          "title1": "Built",
+          "title2": "for",
+          "title3": "Owners",
+          "desc": "Clear features, practical specs, and commercial support so factory owners understand exactly what they are buying."
+        },
+        {
+          "title1": "Regional",
           "title2": "Factory",
-          "title3": "Automation",
-          "desc": "Upgrade legacy systems with AI-driven monitoring and precise robotic calibration for zero-downtime manufacturing.",
-          "statLabel": "Uptime achieved by our smart systems.",
-          "badge": "AI Monitored",
-          "features": ["AI Monitoring", "Robotics", "Zero Downtime"]
-        },
-        {
-          "title1": "Eco-Friendly",
-          "title2": "Sustainable",
-          "title3": "Solutions",
-          "desc": "Reducing carbon footprint with energy-efficient machinery and sustainable raw materials.",
-          "statLabel": "Reduction in energy consumption.",
-          "badge": "Eco Certified",
-          "features": ["Energy Efficient", "Recyclable", "Green Tech"]
-        },
-        {
-          "title1": "Global",
-          "title2": "Supply",
-          "title3": "Chain",
-          "desc": "Connecting factories worldwide with seamless logistics, real-time tracking, and reliable delivery.",
-          "statLabel": "Countries with active operations.",
-          "badge": "Global Reach",
-          "features": ["Logistics", "Tracking", "24/7 Support"]
+          "title3": "Network",
+          "desc": "Serving food and pharmaceutical manufacturers with machinery, materials, and follow-up support across the region."
         }
       ]
     },
+    "industries": {
+      "kicker": "What we supply",
+      "title": "Machinery & materials for food and pharma factories",
+      "subtitle": "Two focused offers for business owners — open the matching catalog categories, review subcategories, then request a quote with clear product context.",
+      "served": {
+        "food": "Food factories",
+        "pharma": "Pharmaceutical factories"
+      },
+      "viewAllCategories": "View all categories",
+      "openCategories": "Open catalog categories",
+      "browseCatalog": "Browse catalog",
+      "requestQuote": "Request a quote",
+      "pillars": {
+        "machinery": {
+          "badge": "Pillar 01",
+          "kicker": "Production equipment",
+          "title": "Machinery for pharmaceutical & food factories",
+          "description": "Industrial machines for regulated plants: filling, packaging, dosing, and process equipment with clear capacity and commercial options.",
+          "features": [
+            "Filling & packaging lines",
+            "Food-grade hygienic design",
+            "Pharma-ready process options",
+            "Clear capacity & power specs",
+            "Installation-ready documentation",
+            "Spare parts & after-sales support"
+          ],
+          "cta": "Open machinery categories"
+        },
+        "materials": {
+          "badge": "Pillar 02",
+          "kicker": "Factory inputs",
+          "title": "Raw materials for pharmaceutical & food factories",
+          "description": "Reliable raw materials and ingredients for food and pharma production — selected for consistency, compliance support, and uninterrupted plant supply.",
+          "features": [
+            "Food-grade ingredients & resins",
+            "Pharma-grade inputs & excipients",
+            "Batch consistency focus",
+            "Traceability-oriented sourcing",
+            "Flexible supply volumes",
+            "Commercial quotation support"
+          ],
+          "cta": "Open materials category"
+        }
+      },
+      "owner": {
+        "kicker": "For business owners",
+        "title": "Category → subcategory → product → quote",
+        "body": "Browse by category, open only the related subcategories, then review the products that belong there — so owners and procurement teams always know what they are specifying.",
+        "points": [
+          "See features and specs clearly",
+          "Request quotes with product context",
+          "One partner for machines + materials"
+        ]
+      }
+    },
     "domains": {
-      "kicker": "Core Domains",
-      "title": "Industrial",
-      "titleAccent": "Solutions",
-      "viewAll": "View all machinery",
-      "ticker": ["Packaging", "Filling lines", "Raw materials", "Spare parts"]
+      "kicker": "Catalog domains",
+      "title": "Machinery &",
+      "titleAccent": "Materials",
+      "viewAll": "View all categories",
+      "ticker": [
+        "Food machinery",
+        "Pharma machinery",
+        "Food raw materials",
+        "Pharma raw materials"
+      ]
     },
     "featured": {
-      "kicker": "Featured equipment",
+      "kicker": "Featured for factories",
       "title": "Live from the",
       "titleAccent": "catalog",
       "viewAll": "View all products"
     },
     "layers": {
-      "kicker": "How a Bosco line is built",
-      "title": "Four layers. One factory that actually ships.",
-      "subtitle": "Scroll to stack each layer of the operation — filling, packaging, materials, and the service that keeps them alive.",
+      "kicker": "How Bosco supports your plant",
+      "title": "From machine selection to material supply.",
+      "subtitle": "A simple path for business owners: choose equipment, secure materials, and keep production moving.",
       "items": [
         {
-          "kicker": "Filling lines",
-          "title": "Automated liquid filling that never misses a millilitre.",
-          "body": "High-speed rotary and linear fillers calibrated for food, pharma, and chemical plants.",
-          "statLabel": "bottles per hour",
-          "cta": "Explore filling lines"
-        },
-        {
-          "kicker": "Packaging systems",
-          "title": "Sealing, boxing, and labeling in one continuous motion.",
-          "body": "From vacuum sealers to multi-format cartoners, Bosco lines stitch packaging steps into a single flow.",
-          "statLabel": "lines commissioned",
-          "cta": "See packaging machines"
+          "kicker": "Machinery",
+          "title": "Specify the right machine for your food or pharma line.",
+          "body": "Filling, packaging, and process equipment with clear capacity, power, and commercial options.",
+          "statLabel": "machines ready to quote",
+          "cta": "Explore machinery"
         },
         {
           "kicker": "Raw materials",
-          "title": "Factory-grade inputs, sourced and certified before they arrive.",
-          "body": "Pharmaceutical APIs, food-grade resins, and industrial chemicals arrive with full traceability.",
-          "statLabel": "batch purity",
+          "title": "Secure the inputs your factory runs on every day.",
+          "body": "Food-grade and pharmaceutical-grade materials sourced for consistency and continuous supply.",
+          "statLabel": "material categories",
           "cta": "Browse materials"
         },
         {
-          "kicker": "Spare parts & service",
-          "title": "The parts and people that keep the line running overnight.",
-          "body": "Motors, sensors, seals, and on-call technicians across the region.",
-          "statLabel": "engineering support",
-          "cta": "Talk to engineering"
+          "kicker": "Owner clarity",
+          "title": "Features and specs that make decisions easier.",
+          "body": "Product pages highlight what matters to owners: capacity, compliance orientation, and commercial next steps.",
+          "statLabel": "clear buying path",
+          "cta": "Open catalog"
+        },
+        {
+          "kicker": "Quote & support",
+          "title": "Send a quote request and get a factory-ready response.",
+          "body": "Your request reaches the Bosco team with product details so sales can reply with the right offer.",
+          "statLabel": "response desk",
+          "cta": "Request a quote"
         }
       ]
     },
     "advantage": {
-      "kicker": "The Bosco Advantage",
-      "title": "Why Industry Leaders",
-      "titleAccent": "Trust Our Systems",
-      "body": "We don't just sell machines; we architect end-to-end industrial production ecosystems. From factory planning to 24/7 post-installation maintenance, Bosco ensures zero downtime.",
+      "kicker": "Why factory owners choose Bosco",
+      "title": "Clear supply for",
+      "titleAccent": "Food & Pharma plants",
+      "body": "We help business owners source machinery and raw materials with practical specs, reliable follow-up, and one trading partner for both production equipment and factory inputs.",
       "points": [
-        "Premium European & Asian high-throughput components",
-        "24/7 dedicated technical support & maintenance",
-        "Custom-engineered production lines tailored to your floor"
+        "Machinery focused on food & pharmaceutical factories",
+        "Raw materials selected for regulated production",
+        "Quote flow with full product context for faster decisions"
       ],
-      "stats": ["Machines Installed", "Satisfied Factories", "Countries Reached", "Years Experience"]
+      "stats": [
+        "Machines Quoted",
+        "Factory Partners",
+        "Countries Served",
+        "Years Experience"
+      ]
     },
     "success": {
       "kicker": "Client Success",
       "title": "Partnering with Industry Leaders",
       "subtitle": "Live lines. Real plants. The same desks that answer your quote.",
       "reviews": [
-        { "name": "Ahmed Hassan", "company": "Nile Foods Corp", "role": "Plant Director", "text": "Bosco transformed our production speed. The new liquid filling line increased our output by 300%." },
-        { "name": "Sarah Mahmoud", "company": "Global Chem", "role": "Procurement Lead", "text": "The raw materials we source from Bosco are always top-tier. Their logistics team ensures we never face downtime." },
-        { "name": "Tarek Ziad", "company": "Apex Packaging", "role": "Operations", "text": "Highly reliable vacuum machines. Build quality and the machine UI are unmatched in Egypt." },
-        { "name": "Lina Farouk", "company": "Delta Beverages", "role": "Production Head", "text": "Installation was clean, training was sharp, and the line hit target speed in week one." },
-        { "name": "Omar Khalil", "company": "Red Sea Pharma", "role": "QA Manager", "text": "Traceability on APIs and the spare-parts desk kept our validation window intact." },
-        { "name": "Maya Nabil", "company": "Cairo Converters", "role": "CEO", "text": "One partner for fillers, film, and service. That is the difference on a real factory floor." }
+        {
+          "name": "Ahmed Hassan",
+          "company": "Nile Foods Corp",
+          "role": "Plant Director",
+          "text": "Bosco transformed our production speed. The new liquid filling line increased our output by 300%."
+        },
+        {
+          "name": "Sarah Mahmoud",
+          "company": "Global Chem",
+          "role": "Procurement Lead",
+          "text": "The raw materials we source from Bosco are always top-tier. Their logistics team ensures we never face downtime."
+        },
+        {
+          "name": "Tarek Ziad",
+          "company": "Apex Packaging",
+          "role": "Operations",
+          "text": "Highly reliable vacuum machines. Build quality and the machine UI are unmatched in Egypt."
+        },
+        {
+          "name": "Lina Farouk",
+          "company": "Delta Beverages",
+          "role": "Production Head",
+          "text": "Installation was clean, training was sharp, and the line hit target speed in week one."
+        },
+        {
+          "name": "Omar Khalil",
+          "company": "Red Sea Pharma",
+          "role": "QA Manager",
+          "text": "Traceability on APIs and the spare-parts desk kept our validation window intact."
+        },
+        {
+          "name": "Maya Nabil",
+          "company": "Cairo Converters",
+          "role": "CEO",
+          "text": "One partner for fillers, film, and service. That is the difference on a real factory floor."
+        }
       ]
     },
     "contact": {
@@ -312,24 +492,55 @@
       "title": "Let’s spec your next production line.",
       "quoteTitle": "Get a line quotation that a factory can actually use.",
       "lead": "The same brief lands in the Bosco admin desk. Tell us what you fill, pack, or supply — we answer with machines, not a brochure.",
-      "chips": ["24h technical reply", "Alexandria HQ", "Egypt + GCC coverage"],
+      "chips": [
+        "24h technical reply",
+        "Alexandria HQ",
+        "Egypt + GCC coverage"
+      ],
       "offices": [
-        { "label": "Headquarters", "value": "Alexandria, Egypt" },
-        { "label": "Engineering desk", "value": "+20 100 000 0000" },
-        { "label": "Sales", "value": "sales@bosco-trade.com" },
-        { "label": "Response", "value": "Inside 24 working hours" }
+        {
+          "label": "Headquarters",
+          "value": "Alexandria, Egypt"
+        },
+        {
+          "label": "Phone",
+          "value": "012 77712790"
+        },
+        {
+          "label": "Email",
+          "value": "bosco.intertrade@outlook.com"
+        },
+        {
+          "label": "Response",
+          "value": "Inside 24 working hours"
+        }
       ],
       "floorKicker": "On the floor",
       "floorTitle": "Engineers, not a ticket queue.",
       "steps": [
-        { "title": "Send the brief", "text": "Line speed, product, and factory constraints." },
-        { "title": "We spec the line", "text": "A Bosco engineer maps machines, materials, and layout." },
-        { "title": "Quote lands", "text": "You get a clear commercial and technical reply." }
+        {
+          "title": "Send the brief",
+          "text": "Line speed, product, and factory constraints."
+        },
+        {
+          "title": "We spec the line",
+          "text": "A Bosco engineer maps machines, materials, and layout."
+        },
+        {
+          "title": "Quote lands",
+          "text": "You get a clear commercial and technical reply."
+        }
       ],
       "formKicker": "Project brief",
       "formTitle": "Send the brief",
       "quoteFormTitle": "Request the quote",
-      "needs": ["Filling lines", "Packaging machines", "Raw materials", "Spare parts", "Turnkey factory"],
+      "needs": [
+        "Filling lines",
+        "Packaging machines",
+        "Raw materials",
+        "Spare parts",
+        "Turnkey factory"
+      ],
       "needLabel": "What do you need?",
       "namePh": "Your name",
       "emailPh": "name@factory.com",
@@ -343,11 +554,13 @@
     "productsPage": {
       "kicker": "Live industrial catalog",
       "title": "Every machine, material, and line — by category.",
-      "lead": "Choose a category, open its subcategories, then inspect the live equipment assigned to that family.",
+      "lead": "Choose a category, open its subcategories, then inspect only the products in that family.",
       "search": "Search a model, line, or material...",
       "loading": "Loading catalog…",
       "results": "{{count}} results",
-      "pickFamily": "Pick a family",
+      "pickFamily": "Browse by category",
+      "browseHint": "Open a category to see its subcategories only, then open a subcategory to see its products only.",
+      "searchResults": "Search results",
       "categories": "Categories",
       "clear": "Clear filters",
       "allCatalog": "All catalog",
@@ -370,16 +583,32 @@
     },
     "categoriesPage": {
       "kicker": "Catalog",
-      "title": "Explore every industrial domain",
-      "lead": "Packaging, filling, raw materials, and spare parts — managed live from the Bosco admin dashboard.",
+      "title": "Machinery & materials for food & pharma",
+      "lead": "Start with a category, open its subcategories, then view only the products inside that family.",
       "productsSubs": "{{products}} products · {{subs}} subcategories",
       "titleDoc": "Industrial Categories"
     },
     "categoryDetails": {
       "empty": "No products in this selection yet.",
       "emptyHint": "Add them from the admin dashboard.",
+      "emptySubs": "No subcategories in this category yet.",
       "goAdmin": "Go to admin",
-      "loading": "Loading category..."
+      "loading": "Loading category...",
+      "subsKicker": "Step 2",
+      "subsTitle": "Choose a subcategory",
+      "subsLead": "Each subcategory opens its own product list — nothing mixed from other families.",
+      "subCount": "{{count}} subcategories",
+      "productCount": "{{count}} products"
+    },
+    "subcategoryDetails": {
+      "loading": "Loading subcategory...",
+      "notFound": "Subcategory not found in this category.",
+      "backCategory": "Back to category",
+      "productsKicker": "Step 3",
+      "productsTitle": "Products in this subcategory",
+      "productsLead": "Only equipment and materials assigned to this subcategory.",
+      "productCount": "{{count}} products",
+      "empty": "No products in this subcategory yet."
     },
     "productDetails": {
       "loading": "Loading product...",
@@ -410,7 +639,8 @@
       "rights": "© {{year}} Bosco International Trade. All rights reserved.",
       "privacy": "Privacy",
       "terms": "Terms",
-      "admin": "Admin"
+      "admin": "Admin",
+      "bosco": "Bosco"
     },
     "about": {
       "badge": "About Bosco International Trade",
@@ -419,7 +649,12 @@
       "hero": "We connect factories with the machinery, raw materials, and commercial pathways they need to grow — across food, pharmaceutical, and industrial supply chains.",
       "partner": "Partner With Us",
       "scroll": "Scroll to explore",
-      "stats": ["Years of Experience", "Partner Factories", "Countries Served", "Machines Delivered"],
+      "stats": [
+        "Years of Experience",
+        "Partner Factories",
+        "Countries Served",
+        "Machines Delivered"
+      ],
       "story": "Our Story",
       "storyTitle": "More Than",
       "storyAccent": "A Trading Company",
@@ -430,19 +665,44 @@
       "engineered": "Engineered for",
       "impact": "Long-Term Impact",
       "pillars": [
-        { "title": "Precision Sourcing", "text": "We identify the right machinery and materials for regulated, high-volume production environments." },
-        { "title": "Trusted Supply", "text": "Every partnership is built on reliability, compliance, and long-term industrial performance." },
-        { "title": "Global Reach", "text": "Connecting manufacturers with international suppliers, technologies, and market opportunities." }
+        {
+          "title": "Precision Sourcing",
+          "text": "We identify the right machinery and materials for regulated, high-volume production environments."
+        },
+        {
+          "title": "Trusted Supply",
+          "text": "Every partnership is built on reliability, compliance, and long-term industrial performance."
+        },
+        {
+          "title": "Global Reach",
+          "text": "Connecting manufacturers with international suppliers, technologies, and market opportunities."
+        }
       ],
       "journey": "Our Journey",
       "decades": "Two Decades of",
       "progress": "Industrial Progress",
       "journeyLead": "A consistent focus on quality sourcing, trusted partnerships, and practical support for modern manufacturing teams.",
       "timeline": [
-        { "year": "2004", "title": "Founded with a clear mission", "text": "Bosco began as a focused trading partner for food and pharmaceutical manufacturers." },
-        { "year": "2012", "title": "Expanded industrial ecosystem", "text": "Added machinery sourcing, raw material supply, and finished product distribution." },
-        { "year": "2020", "title": "International scale", "text": "Built cross-border partnerships across 15 countries with dedicated project support." },
-        { "year": "Today", "title": "End-to-end B2B partner", "text": "One team supporting factories from equipment selection to ongoing supply continuity." }
+        {
+          "year": "2004",
+          "title": "Founded with a clear mission",
+          "text": "Bosco began as a focused trading partner for food and pharmaceutical manufacturers."
+        },
+        {
+          "year": "2012",
+          "title": "Expanded industrial ecosystem",
+          "text": "Added machinery sourcing, raw material supply, and finished product distribution."
+        },
+        {
+          "year": "2020",
+          "title": "International scale",
+          "text": "Built cross-border partnerships across 15 countries with dedicated project support."
+        },
+        {
+          "year": "Today",
+          "title": "End-to-end B2B partner",
+          "text": "One team supporting factories from equipment selection to ongoing supply continuity."
+        }
       ],
       "mission": "Our Mission",
       "power": "Power",

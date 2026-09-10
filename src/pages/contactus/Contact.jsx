@@ -8,11 +8,12 @@ import { FiClock, FiMail, FiMapPin, FiPhone, FiSend } from 'react-icons/fi';
 import SafeImage from '../../components/SafeImage';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { inquiryService } from '../../services/inquiryService';
+import { COMPANY } from '../../utils/company';
 
 const officeMeta = [
-  { icon: FiMapPin, href: 'https://maps.google.com/?q=Alexandria,Egypt' },
-  { icon: FiPhone, href: 'tel:+201000000000' },
-  { icon: FiMail, href: 'mailto:sales@bosco-trade.com' },
+  { icon: FiMapPin, href: COMPANY.maps },
+  { icon: FiPhone, href: `tel:${COMPANY.phoneTel}` },
+  { icon: FiMail, href: `mailto:${COMPANY.email}` },
   { icon: FiClock, href: null },
 ];
 
@@ -43,8 +44,9 @@ export default function Contact() {
     event.preventDefault();
     setSending(true);
     try {
-      const result = await inquiryService.create({
+      await inquiryService.create({
         ...form,
+        type: isQuote ? 'quote' : 'contact',
         message: `${activeNeed} — ${form.message}`,
       });
       toast.success(t('site.contact.success'));
@@ -111,7 +113,7 @@ export default function Contact() {
       </section>
 
       <section className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 -mt-6 sm:-mt-8 pb-16 sm:pb-24">
-        <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
+        <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 mb-10">
           {offices.map((item) => {
             const Icon = item.icon;
             const inner = (
@@ -121,12 +123,12 @@ export default function Contact() {
                 </span>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">{item.label}</p>
-                  <p className="font-black text-lg mt-1 text-gray-900 dark:text-white">{item.value}</p>
+                  <p className="font-black text-lg text-gray-900 dark:text-white">{item.value}</p>
                 </div>
               </>
             );
             const cls =
-              'contact-card flex items-start gap-4 rounded-[24px] bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/10 p-5 text-start hover:-translate-y-1 transition-transform duration-300';
+              'contact-card flex items-start gap-4 rounded-[24px] bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/10 p-2 text-start hover:-translate-y-1 transition-transform duration-300';
             return item.href ? (
               <a key={item.label} href={item.href} className={cls}>
                 {inner}
@@ -249,6 +251,14 @@ export default function Contact() {
               {sending ? t('site.common.sending') : isQuote ? t('site.contact.quoteSubmit') : t('site.contact.submit')}
               <FiSend />
             </button>
+            <a
+              href={COMPANY.whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-pump inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-white font-bold py-3.5"
+            >
+              WhatsApp · {COMPANY.phoneDisplay}
+            </a>
             <p className="text-xs text-gray-500 text-center">
               {t('site.contact.note')}
             </p>

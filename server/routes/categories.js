@@ -29,8 +29,10 @@ categories.post('/', requireAdmin, async (c) => {
 
   const result = queries.insertCategory.run(
     body.name.trim(),
+    (body.name_ar || '').trim(),
     uniqueSlug('categories', body.slug || body.name),
     body.description || '',
+    body.description_ar || '',
     body.image || '',
     body.icon || 'FiBox',
     toInt(body.sort_order, 0),
@@ -48,8 +50,10 @@ categories.put('/:id', requireAdmin, async (c) => {
   const body = await c.req.json().catch(() => ({}));
   queries.updateCategory.run(
     body.name?.trim() || existing.name,
+    body.name_ar != null ? String(body.name_ar).trim() : existing.name_ar || '',
     uniqueSlug('categories', body.slug || body.name || existing.name, id),
     body.description ?? existing.description,
+    body.description_ar != null ? body.description_ar : existing.description_ar || '',
     body.image ?? existing.image,
     body.icon ?? existing.icon,
     toInt(body.sort_order, existing.sort_order),

@@ -1,3 +1,4 @@
+import { secureHeaders } from 'hono/secure-headers';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Hono } from 'hono';
@@ -12,6 +13,7 @@ import subcategoryRoutes from './routes/subcategories.js';
 import productRoutes from './routes/products.js';
 import uploadRoutes from './routes/upload.js';
 import inquiryRoutes from './routes/inquiries.js';
+import mailRoutes from './routes/mail.js';
 
 const app = new Hono();
 
@@ -25,27 +27,38 @@ function corsOrigin(origin) {
   const allowed = new Set([
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-    'https://rana-fathi-m.github.io',
     'https://abdelrahman303.github.io',
+    'https://rana-fathi-m.github.io',
     ...extraOrigins,
   ]);
-  if (allowed.has(origin)) return origin;
-  try {
-    const host = new URL(origin).hostname;
-    if (host.endsWith('.github.io')) return origin;
-  } catch {
-    return null;
-  }
-  return null;
+  return allowed.has(origin) ? origin : null;
 }
+
+app.use(
+  '*',
+  secureHeaders({
+    xFrameOptions: 'DENY',
+    xContentTypeOptions: 'nosniff',
+    referrerPolicy: 'strict-origin-when-cross-origin',
+    strictTransportSecurity: 'max-age=31536000; includeSubDomains',
+    contentSecurityPolicy: false,
+  })
+);
+
+app.use('*', async (c, next) => {
+  await next();
+  c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  c.header('X-API-Transport', 'tls-required-in-production');
+});
 
 app.use('*', logger());
 app.use(
   '*',
   cors({
     origin: corsOrigin,
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 86400,
   })
 );
 
@@ -71,6 +84,7 @@ app.route('/api/products', productRoutes);
 app.use('/api/admin/upload', bodyLimit({ maxSize: 12 * 1024 * 1024 }));
 app.route('/api/admin/upload', uploadRoutes);
 app.route('/api/inquiries', inquiryRoutes);
+app.route('/api/admin/mail', mailRoutes);
 
 function serveUpload(c) {
   const file = c.req.param('file');
@@ -105,7 +119,11 @@ app.get('/api/uploads/:file', serveUpload);
 app.notFound((c) => c.json({ message: 'Route not found.' }, 404));
 app.onError((error, c) => {
   console.error(error);
-  return c.json({ message: error.message || 'Unexpected server error.' }, 500);
+  const message =
+    process.env.NODE_ENV === 'production'
+      ? 'Unexpected server error.'
+      : error.message || 'Unexpected server error.';
+  return c.json({ message }, 500);
 });
 
 export default app;

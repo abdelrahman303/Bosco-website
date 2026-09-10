@@ -98,6 +98,21 @@ db.exec(`
   );
 `);
 
+function ensureColumn(table, column, definition = "TEXT NOT NULL DEFAULT ''") {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((col) => col.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
+ensureColumn('categories', 'name_ar');
+ensureColumn('categories', 'description_ar');
+ensureColumn('subcategories', 'name_ar');
+ensureColumn('subcategories', 'description_ar');
+ensureColumn('products', 'name_ar');
+ensureColumn('products', 'short_description_ar');
+ensureColumn('products', 'description_ar');
+
 function slugify(value) {
   return String(value || '')
     .toLowerCase()
@@ -157,10 +172,20 @@ export function mapProduct(row) {
     in_stock: Boolean(row.in_stock),
     price_on_request: Boolean(row.price_on_request),
     category: row.category_name
-      ? { id: row.category_id, name: row.category_name, slug: row.category_slug }
+      ? {
+          id: row.category_id,
+          name: row.category_name,
+          name_ar: row.category_name_ar || '',
+          slug: row.category_slug,
+        }
       : undefined,
     subcategory: row.subcategory_name
-      ? { id: row.subcategory_id, name: row.subcategory_name, slug: row.subcategory_slug }
+      ? {
+          id: row.subcategory_id,
+          name: row.subcategory_name,
+          name_ar: row.subcategory_name_ar || '',
+          slug: row.subcategory_slug,
+        }
       : undefined,
   };
 }
@@ -169,8 +194,10 @@ const PRODUCT_SELECT = `
   SELECT
     p.*,
     c.name AS category_name,
+    c.name_ar AS category_name_ar,
     c.slug AS category_slug,
     s.name AS subcategory_name,
+    s.name_ar AS subcategory_name_ar,
     s.slug AS subcategory_slug
   FROM products p
   LEFT JOIN categories c ON c.id = p.category_id
@@ -192,12 +219,12 @@ export const queries = {
   categoryById: db.prepare('SELECT * FROM categories WHERE id = ?'),
   categoryBySlug: db.prepare('SELECT * FROM categories WHERE slug = ?'),
   insertCategory: db.prepare(`
-    INSERT INTO categories (name, slug, description, image, icon, sort_order, featured)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO categories (name, name_ar, slug, description, description_ar, image, icon, sort_order, featured)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `),
   updateCategory: db.prepare(`
     UPDATE categories
-    SET name = ?, slug = ?, description = ?, image = ?, icon = ?, sort_order = ?, featured = ?, updated_at = datetime('now')
+    SET name = ?, name_ar = ?, slug = ?, description = ?, description_ar = ?, image = ?, icon = ?, sort_order = ?, featured = ?, updated_at = datetime('now')
     WHERE id = ?
   `),
   deleteCategory: db.prepare('DELETE FROM categories WHERE id = ?'),
@@ -218,12 +245,12 @@ export const queries = {
   subcategoryById: db.prepare('SELECT * FROM subcategories WHERE id = ?'),
   subcategoryBySlug: db.prepare('SELECT * FROM subcategories WHERE slug = ?'),
   insertSubcategory: db.prepare(`
-    INSERT INTO subcategories (category_id, name, slug, description, image, sort_order)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO subcategories (category_id, name, name_ar, slug, description, description_ar, image, sort_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `),
   updateSubcategory: db.prepare(`
     UPDATE subcategories
-    SET category_id = ?, name = ?, slug = ?, description = ?, image = ?, sort_order = ?, updated_at = datetime('now')
+    SET category_id = ?, name = ?, name_ar = ?, slug = ?, description = ?, description_ar = ?, image = ?, sort_order = ?, updated_at = datetime('now')
     WHERE id = ?
   `),
   deleteSubcategory: db.prepare('DELETE FROM subcategories WHERE id = ?'),
@@ -232,15 +259,15 @@ export const queries = {
   productBySlug: db.prepare(`${PRODUCT_SELECT} WHERE p.slug = ?`),
   insertProduct: db.prepare(`
     INSERT INTO products (
-      category_id, subcategory_id, name, slug, model, sku, short_description, description,
+      category_id, subcategory_id, name, name_ar, slug, model, sku, short_description, short_description_ar, description, description_ar,
       image, gallery, specs, features, price, currency, price_on_request, brand, origin,
       capacity, power, dimensions, warranty, featured, in_stock, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `),
   updateProduct: db.prepare(`
     UPDATE products SET
-      category_id = ?, subcategory_id = ?, name = ?, slug = ?, model = ?, sku = ?,
-      short_description = ?, description = ?, image = ?, gallery = ?, specs = ?, features = ?,
+      category_id = ?, subcategory_id = ?, name = ?, name_ar = ?, slug = ?, model = ?, sku = ?,
+      short_description = ?, short_description_ar = ?, description = ?, description_ar = ?, image = ?, gallery = ?, specs = ?, features = ?,
       price = ?, currency = ?, price_on_request = ?, brand = ?, origin = ?, capacity = ?,
       power = ?, dimensions = ?, warranty = ?, featured = ?, in_stock = ?, status = ?,
       updated_at = datetime('now')
@@ -252,13 +279,73 @@ export const queries = {
     INSERT INTO inquiries (name, email, company, phone, message, product_id)
     VALUES (?, ?, ?, ?, ?, ?)
   `),
-  allInquiries: db.prepare(`
-    SELECT i.*, p.name AS product_name, p.slug AS product_slug
+  inquiryById: db.prepare(`
+    SELECT
+      i.*,
+      p.name AS product_name,
+      p.name_ar AS product_name_ar,
+      p.slug AS product_slug,
+      p.model AS product_model,
+      p.sku AS product_sku,
+      p.image AS product_image,
+      p.short_description AS product_short_description,
+      p.short_description_ar AS product_short_description_ar,
+      p.description AS product_description,
+      p.description_ar AS product_description_ar,
+      p.price AS product_price,
+      p.currency AS product_currency,
+      p.price_on_request AS product_price_on_request,
+      p.brand AS product_brand,
+      p.origin AS product_origin,
+      p.capacity AS product_capacity,
+      p.power AS product_power,
+      p.dimensions AS product_dimensions,
+      p.warranty AS product_warranty,
+      p.specs AS product_specs,
+      p.features AS product_features,
+      c.name AS category_name,
+      c.name_ar AS category_name_ar,
+      c.slug AS category_slug
     FROM inquiries i
     LEFT JOIN products p ON p.id = i.product_id
+    LEFT JOIN categories c ON c.id = p.category_id
+    WHERE i.id = ?
+  `),
+  allInquiries: db.prepare(`
+    SELECT
+      i.*,
+      p.name AS product_name,
+      p.name_ar AS product_name_ar,
+      p.slug AS product_slug,
+      p.model AS product_model,
+      p.sku AS product_sku,
+      p.image AS product_image,
+      p.short_description AS product_short_description,
+      p.short_description_ar AS product_short_description_ar,
+      p.description AS product_description,
+      p.description_ar AS product_description_ar,
+      p.price AS product_price,
+      p.currency AS product_currency,
+      p.price_on_request AS product_price_on_request,
+      p.brand AS product_brand,
+      p.origin AS product_origin,
+      p.capacity AS product_capacity,
+      p.power AS product_power,
+      p.dimensions AS product_dimensions,
+      p.warranty AS product_warranty,
+      p.specs AS product_specs,
+      p.features AS product_features,
+      c.name AS category_name,
+      c.name_ar AS category_name_ar,
+      c.slug AS category_slug
+    FROM inquiries i
+    LEFT JOIN products p ON p.id = i.product_id
+    LEFT JOIN categories c ON c.id = p.category_id
     ORDER BY i.created_at DESC
   `),
-
+  updateInquiryStatus: db.prepare(`
+    UPDATE inquiries SET status = ? WHERE id = ?
+  `),
   countCategories: db.prepare('SELECT COUNT(*) AS count FROM categories'),
   countSubcategories: db.prepare('SELECT COUNT(*) AS count FROM subcategories'),
   countProducts: db.prepare('SELECT COUNT(*) AS count FROM products'),
@@ -266,6 +353,58 @@ export const queries = {
   countFeatured: db.prepare('SELECT COUNT(*) AS count FROM products WHERE featured = 1'),
   countInquiries: db.prepare("SELECT COUNT(*) AS count FROM inquiries WHERE status = 'new'"),
 };
+
+export function mapInquiry(row) {
+  if (!row) return null;
+  const product = row.product_id
+    ? {
+        id: row.product_id,
+        name: row.product_name || '',
+        name_ar: row.product_name_ar || '',
+        slug: row.product_slug || '',
+        model: row.product_model || '',
+        sku: row.product_sku || '',
+        image: row.product_image || '',
+        short_description: row.product_short_description || '',
+        short_description_ar: row.product_short_description_ar || '',
+        description: row.product_description || '',
+        description_ar: row.product_description_ar || '',
+        price: row.product_price,
+        currency: row.product_currency || 'USD',
+        price_on_request: Boolean(row.product_price_on_request),
+        brand: row.product_brand || '',
+        origin: row.product_origin || '',
+        capacity: row.product_capacity || '',
+        power: row.product_power || '',
+        dimensions: row.product_dimensions || '',
+        warranty: row.product_warranty || '',
+        specs: parseJson(row.product_specs, {}),
+        features: parseJson(row.product_features, []),
+        category: row.category_name
+          ? {
+              name: row.category_name,
+              name_ar: row.category_name_ar || '',
+              slug: row.category_slug || '',
+            }
+          : null,
+      }
+    : null;
+
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    company: row.company || '',
+    phone: row.phone || '',
+    message: row.message,
+    product_id: row.product_id,
+    status: row.status || 'new',
+    created_at: row.created_at,
+    product_name: row.product_name || '',
+    product_slug: row.product_slug || '',
+    product,
+  };
+}
 
 export function listProducts({
   categoryId,
@@ -297,9 +436,11 @@ export function listProducts({
     clauses.push('p.featured = 1');
   }
   if (q) {
-    clauses.push('(p.name LIKE ? OR p.model LIKE ? OR p.short_description LIKE ? OR p.sku LIKE ?)');
+    clauses.push(
+      '(p.name LIKE ? OR p.name_ar LIKE ? OR p.model LIKE ? OR p.short_description LIKE ? OR p.short_description_ar LIKE ? OR p.sku LIKE ?)'
+    );
     const like = `%${q}%`;
-    params.push(like, like, like, like);
+    params.push(like, like, like, like, like, like);
   }
 
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
@@ -320,12 +461,22 @@ export function similarProducts(product, limit = 4) {
 }
 
 function seed() {
-  const email = (process.env.ADMIN_EMAIL || 'rana.fathi.rana@gmail.com').toLowerCase();
-  const password = process.env.ADMIN_PASSWORD || '11RF22rf$$';
-  const existingAdmin = queries.adminByEmail.get(email);
+  const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD || '';
 
-  if (!existingAdmin) {
-    queries.insertAdmin.run(email, bcrypt.hashSync(password, 12), 'Rana Fathi');
+  if (email && password) {
+    const existingAdmin = queries.adminByEmail.get(email);
+    if (!existingAdmin) {
+      queries.insertAdmin.run(email, bcrypt.hashSync(password, 12), 'Bosco Admin');
+      console.log(`Seeded admin from env: ${email}`);
+    }
+  } else {
+    const adminCount = db.prepare('SELECT COUNT(*) AS count FROM admins').get().count;
+    if (!adminCount) {
+      console.warn(
+        'No admin seeded. Set ADMIN_EMAIL and ADMIN_PASSWORD in .env, or run: npm run create-admin -- <email> <password>'
+      );
+    }
   }
 
   if (queries.countCategories.get().count > 0) return;
@@ -333,28 +484,36 @@ function seed() {
   const categories = [
     {
       name: 'Packaging Machines',
+      name_ar: 'آلات التعبئة والتغليف',
       description: 'High-speed vacuum, wrapping, sealing, and labeling systems for massive throughput.',
+      description_ar: 'أنظمة تفريغ وتغليف وختم ولصق عالية السرعة لخطوط الإنتاج الكبيرة.',
       image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
       icon: 'FiBox',
       sort_order: 1,
     },
     {
       name: 'Filling Lines',
+      name_ar: 'خطوط التعبئة',
       description: 'Precision liquid and powder automated filling systems built for regulated factories.',
+      description_ar: 'أنظمة تعبئة سوائل ومساحيق آلية دقيقة للمصانع الخاضعة للرقابة.',
       image: 'https://images.unsplash.com/photo-1513828646241-13783a48e7ba?q=80&w=1400&auto=format&fit=crop',
       icon: 'FiDroplet',
       sort_order: 2,
     },
     {
       name: 'Raw Materials',
+      name_ar: 'المواد الخام',
       description: 'Premium chemicals, food-grade inputs, and pharmaceutical-grade ingredients.',
+      description_ar: 'كيماويات ومدخلات غذائية ومكونات صيدلانية عالية الجودة.',
       image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1400&auto=format&fit=crop',
       icon: 'FiLayers',
       sort_order: 3,
     },
     {
       name: 'Spare Parts',
+      name_ar: 'قطع الغيار',
       description: 'Motors, sensors, belts, and vital maintenance components that keep lines running.',
+      description_ar: 'محركات وحساسات وسيور ومكونات صيانة أساسية لاستمرار خطوط الإنتاج.',
       image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=1400&auto=format&fit=crop',
       icon: 'FiSettings',
       sort_order: 4,
@@ -366,8 +525,10 @@ function seed() {
     const slug = uniqueSlug('categories', cat.name);
     const result = queries.insertCategory.run(
       cat.name,
+      cat.name_ar,
       slug,
       cat.description,
+      cat.description_ar,
       cat.image,
       cat.icon,
       cat.sort_order,
@@ -377,16 +538,16 @@ function seed() {
   }
 
   const subcategories = [
-    { category: 'Packaging Machines', name: 'Vacuum Sealers', description: 'Industrial vacuum and MAP sealing for food and pharma.', image: 'https://images.unsplash.com/photo-1580983554972-2438848d5eb2?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Packaging Machines', name: 'Wrapping Systems', description: 'Flow wrap, shrink, and stretch wrapping for high volume.', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Packaging Machines', name: 'Labeling Machines', description: 'Rotary and linear labeling for multi-format bottles.', image: 'https://images.unsplash.com/photo-1611078608889-183424d852a3?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Filling Lines', name: 'Liquid Fillers', description: 'Volumetric and gravimetric liquid filling at industrial speed.', image: 'https://images.unsplash.com/photo-1513828646241-13783a48e7ba?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Filling Lines', name: 'Powder Dosing', description: 'Dust-free powder and granule dosing units.', image: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Filling Lines', name: 'Complete Lines', description: 'Turnkey bottling and filling lines from rinse to pack.', image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Raw Materials', name: 'Food-Grade Inputs', description: 'Certified resins, additives, and processing ingredients.', image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Raw Materials', name: 'Pharmaceutical APIs', description: 'GMP-compliant active ingredients and excipients.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Spare Parts', name: 'Motors & Drives', description: 'Servo motors, inverters, and drive assemblies.', image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=1200&auto=format&fit=crop' },
-    { category: 'Spare Parts', name: 'Sensors & Controls', description: 'Photoelectric, proximity, and PLC-ready sensor kits.', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Packaging Machines', name: 'Vacuum Sealers', name_ar: 'أجهزة اللحام بالتفريغ', description: 'Industrial vacuum and MAP sealing for food and pharma.', description_ar: 'لحام تفريغ وMAP صناعي للأغذية والأدوية.', image: 'https://images.unsplash.com/photo-1580983554972-2438848d5eb2?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Packaging Machines', name: 'Wrapping Systems', name_ar: 'أنظمة التغليف', description: 'Flow wrap, shrink, and stretch wrapping for high volume.', description_ar: 'تغليف تدفق وانكماش وتمدد للإنتاج الكبير.', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Packaging Machines', name: 'Labeling Machines', name_ar: 'آلات اللصق', description: 'Rotary and linear labeling for multi-format bottles.', description_ar: 'لصق دوار وخطي لزجاجات متعددة الأشكال.', image: 'https://images.unsplash.com/photo-1611078608889-183424d852a3?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Filling Lines', name: 'Liquid Fillers', name_ar: 'ماكينات تعبئة السوائل', description: 'Volumetric and gravimetric liquid filling at industrial speed.', description_ar: 'تعبئة سوائل حجمية ووزنية بسرعة صناعية.', image: 'https://images.unsplash.com/photo-1513828646241-13783a48e7ba?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Filling Lines', name: 'Powder Dosing', name_ar: 'تعبئة المساحيق', description: 'Dust-free powder and granule dosing units.', description_ar: 'وحدات جرعات مساحيق وحبيبات بدون غبار.', image: 'https://images.unsplash.com/photo-1581092335397-9583eb92d232?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Filling Lines', name: 'Complete Lines', name_ar: 'خطوط كاملة', description: 'Turnkey bottling and filling lines from rinse to pack.', description_ar: 'خطوط تعبئة وتغليف متكاملة من الشطف إلى التعبئة.', image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Raw Materials', name: 'Food-Grade Inputs', name_ar: 'مدخلات غذائية', description: 'Certified resins, additives, and processing ingredients.', description_ar: 'راتنجات وإضافات ومكونات معالجة معتمدة.', image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Raw Materials', name: 'Pharmaceutical APIs', name_ar: 'مواد فعالة صيدلانية', description: 'GMP-compliant active ingredients and excipients.', description_ar: 'مواد فعالة وسواغات مطابقة لـ GMP.', image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Spare Parts', name: 'Motors & Drives', name_ar: 'محركات ودوافع', description: 'Servo motors, inverters, and drive assemblies.', description_ar: 'محركات سيرفو ومحولات ومجموعات دفع.', image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=1200&auto=format&fit=crop' },
+    { category: 'Spare Parts', name: 'Sensors & Controls', name_ar: 'حساسات وتحكم', description: 'Photoelectric, proximity, and PLC-ready sensor kits.', description_ar: 'حساسات ضوئية وتقريبية ومجموعات جاهزة لـ PLC.', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop' },
   ];
 
   const subcategoryIds = {};
@@ -395,8 +556,10 @@ function seed() {
     const result = queries.insertSubcategory.run(
       categoryIds[sub.category],
       sub.name,
+      sub.name_ar,
       slug,
       sub.description,
+      sub.description_ar,
       sub.image,
       index + 1
     );
@@ -693,11 +856,14 @@ function seed() {
       categoryIds[product.category],
       subcategoryIds[product.subcategory],
       product.name,
+      product.name_ar || '',
       uniqueSlug('products', product.name),
       product.model,
       product.sku,
       product.short_description,
+      product.short_description_ar || '',
       product.description,
+      product.description_ar || '',
       product.image,
       JSON.stringify(product.gallery),
       JSON.stringify(product.specs),
@@ -718,6 +884,113 @@ function seed() {
   }
 }
 
+function backfillArabic() {
+  const categoryAr = {
+    'Packaging Machines': ['آلات التعبئة والتغليف', 'أنظمة تفريغ وتغليف وختم ولصق عالية السرعة لخطوط الإنتاج الكبيرة.'],
+    'Filling Lines': ['خطوط التعبئة', 'أنظمة تعبئة سوائل ومساحيق آلية دقيقة للمصانع الخاضعة للرقابة.'],
+    'Raw Materials': ['المواد الخام', 'كيماويات ومدخلات غذائية ومكونات صيدلانية عالية الجودة.'],
+    'Spare Parts': ['قطع الغيار', 'محركات وحساسات وسيور ومكونات صيانة أساسية لاستمرار خطوط الإنتاج.'],
+  };
+  const subcategoryAr = {
+    'Vacuum Sealers': ['أجهزة اللحام بالتفريغ', 'لحام تفريغ وMAP صناعي للأغذية والأدوية.'],
+    'Wrapping Systems': ['أنظمة التغليف', 'تغليف تدفق وانكماش وتمدد للإنتاج الكبير.'],
+    'Labeling Machines': ['آلات اللصق', 'لصق دوار وخطي لزجاجات متعددة الأشكال.'],
+    'Liquid Fillers': ['ماكينات تعبئة السوائل', 'تعبئة سوائل حجمية ووزنية بسرعة صناعية.'],
+    'Powder Dosing': ['تعبئة المساحيق', 'وحدات جرعات مساحيق وحبيبات بدون غبار.'],
+    'Complete Lines': ['خطوط كاملة', 'خطوط تعبئة وتغليف متكاملة من الشطف إلى التعبئة.'],
+    'Food-Grade Inputs': ['مدخلات غذائية', 'راتنجات وإضافات ومكونات معالجة معتمدة.'],
+    'Pharmaceutical APIs': ['مواد فعالة صيدلانية', 'مواد فعالة وسواغات مطابقة لـ GMP.'],
+    'Motors & Drives': ['محركات ودوافع', 'محركات سيرفو ومحولات ومجموعات دفع.'],
+    'Sensors & Controls': ['حساسات وتحكم', 'حساسات ضوئية وتقريبية ومجموعات جاهزة لـ PLC.'],
+  };
+  const productAr = {
+    'Automated Liquid Filler Pro': [
+      'آلة تعبئة السوائل الآلية برو',
+      'تعبئة سوائل بسرعة 12,000 زجاجة/ساعة بدقة حجم ±0.1%.',
+      'مصممة لمصانع المشروبات والألبان والعناية الشخصية بسرعة عالية ودقة تعبئة موثوقة.',
+    ],
+    'Vacuum Sealer X-1000': [
+      'جهاز لحام بالتفريغ X-1000',
+      'لحام تفريغ صناعي مستمر لتعبئة الأغذية والطبية.',
+      'غرفة صناعية للورديات المستمرة مع قضبان لحام مزدوجة ودورات تفريغ قابلة للبرمجة.',
+    ],
+    'Rotary Labeling System': [
+      'نظام لصق دوار',
+      'لصق دوار عالي السرعة لزجاجات الزجاج والـ PET.',
+      'يطبق ملصقات الجسم والرقبة والخلف مع توجيه بصري وفحص رؤية.',
+    ],
+    'Flow Wrap System FW-800': [
+      'نظام تغليف تدفق FW-800',
+      'تغليف تدفق مستمر للمخبوزات والحلويات والأدوات.',
+      'تغذية فيلم سيرفو ومدخل صحي للحفاظ على المحاذاة بسرعة عالية.',
+    ],
+    'Powder Dosing Unit PD-50': [
+      'وحدة جرعات مساحيق PD-50',
+      'جرعات مساحيق حجمية بدون غبار للبرطمانات والأكياس.',
+      'جرعات بريمة مع قادوس مغلق واستخراج غبار لأوزان تعبئة دقيقة.',
+    ],
+    'Conveyor Belt Master': [
+      'سير ناقل ماستر',
+      'سير ناقل صناعي مخصص لخطوط التعبئة والتغليف.',
+      'حلول نقل معيارية لإبقاء خطوط الإنتاج متصلة وموثوقة.',
+    ],
+    'Complete Bottling Line BL-12K': [
+      'خط تعبئة زجاجات كامل BL-12K',
+      'خط تعبئة وتغليف متكامل من الشطف إلى التغليف.',
+      'خط جاهز للتشغيل يربط الغسيل والتعبئة والتغطية والوسم.',
+    ],
+    'Food-Grade HDPE Resin': [
+      'راتنج HDPE غذائي',
+      'راتنج بولي إيثيلين عالي الكثافة صالح للأغذية.',
+      'مدخلات بوليمر معتمدة لتطبيقات التعبئة الغذائية والصناعية.',
+    ],
+    'Pharmaceutical Lactose Excipient': [
+      'سواغ لاكتوز صيدلاني',
+      'لاكتوز صيدلاني مطابق لمواصفات GMP.',
+      'سواغ عالي النقاء لتصنيع الأقراص والكبسولات.',
+    ],
+    'Servo Motor SM-400': [
+      'محرك سيرفو SM-400',
+      'محرك سيرفو صناعي لأنظمة التعبئة والدفع.',
+      'محرك دقيق للعزم والاستجابة السريعة في خطوط الإنتاج.',
+    ],
+    'Photoelectric Sensor Kit': [
+      'طقم حساسات كهروضوئية',
+      'طقم حساسات جاهز للتحكم في خطوط التعبئة.',
+      'حساسات موثوقة للكشف والمحاذاة والرفض على الخط.',
+    ],
+    'Rotary Volumetric Filler R-240': [
+      'آلة تعبئة حجمية دوارة R-240',
+      'تعبئة حجمية دوارة مدمجة للزيوت والصلصات والكيماويات.',
+      'تعبئة دوارة بـ 12 رأس للمنتجات اللزجة والرغوية.',
+    ],
+  };
+
+  const updateCat = db.prepare(
+    `UPDATE categories SET name_ar = ?, description_ar = ? WHERE name = ? AND (name_ar IS NULL OR name_ar = '')`
+  );
+  for (const [name, [nameAr, descAr]] of Object.entries(categoryAr)) {
+    updateCat.run(nameAr, descAr, name);
+  }
+
+  const updateSub = db.prepare(
+    `UPDATE subcategories SET name_ar = ?, description_ar = ? WHERE name = ? AND (name_ar IS NULL OR name_ar = '')`
+  );
+  for (const [name, [nameAr, descAr]] of Object.entries(subcategoryAr)) {
+    updateSub.run(nameAr, descAr, name);
+  }
+
+  const updateProd = db.prepare(
+    `UPDATE products
+     SET name_ar = ?, short_description_ar = ?, description_ar = ?
+     WHERE name = ? AND (name_ar IS NULL OR name_ar = '')`
+  );
+  for (const [name, [nameAr, shortAr, descAr]] of Object.entries(productAr)) {
+    updateProd.run(nameAr, shortAr, descAr, name);
+  }
+}
+
 seed();
+backfillArabic();
 
 export default db;

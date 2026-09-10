@@ -41,72 +41,87 @@ export default function SubcategoriesManagement() {
   const productLink = (item) => `/admin/products/new?categoryId=${item.category_id}&subcategoryId=${item.id}`;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="admin-page">
+      <div className="admin-page-header">
         <div className="text-start">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C63637]">{t('admin.catalog')}</p>
-          <h1 className="text-3xl font-black text-start">{t('admin.subcategories')}</h1>
+          <p className="admin-eyebrow">{t('admin.catalog')}</p>
+          <h1 className="admin-title">{t('admin.subcategories')}</h1>
+          <p className="admin-subtitle">{t('admin.itemsCount', { count: items.length })}</p>
         </div>
         <Link to="/admin/subcategories/new" className="admin-primary justify-center">
           <FiPlus /> {t('admin.addSubcategory')}
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:hidden gap-3">
-        {items.map((item) => (
-          <article key={item.id} className="admin-card flex gap-3">
-            <img src={mediaUrl(item.image)} alt="" className="w-16 h-16 rounded-xl object-cover bg-gray-100" />
-            <div className="min-w-0 flex-1">
-              <p className="font-bold">{item.name}</p>
-              <p className="text-xs text-gray-500">{item.category_name}</p>
-              <div className="flex gap-2 mt-2">
-                <Link to={productLink(item)} className="admin-icon-btn" title={t('admin.addProductInSubcategory')}><FiBox /></Link>
-                <Link to={`/admin/subcategories/${item.id}`} className="admin-icon-btn"><FiEdit2 /></Link>
-                <button onClick={() => setPending(item)} className="admin-icon-btn text-red-500"><FiTrash2 /></button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div className="hidden md:block admin-card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-start">
-            <thead className="bg-gray-50 dark:bg-white/5 text-xs uppercase tracking-wider text-gray-500">
-              <tr>
-                <th className="px-5 py-4">{t('admin.subcategories')}</th>
-                <th className="px-5 py-4">{t('admin.parentCategory')}</th>
-                <th className="px-5 py-4">{t('admin.sortOrder')}</th>
-                <th className="px-5 py-4 text-end">{t('admin.actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-t border-gray-100 dark:border-white/5">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <img src={mediaUrl(item.image)} alt="" className="w-12 h-12 rounded-xl object-cover bg-gray-100" />
-                      <div>
-                        <p className="font-bold">{item.name}</p>
-                        <p className="text-xs text-gray-500 line-clamp-1">{item.description}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4 text-sm">{item.category_name}</td>
-                  <td className="px-5 py-4 text-sm">{item.sort_order}</td>
-                  <td className="px-5 py-4">
-                    <div className="flex justify-end gap-2">
-                      <Link to={productLink(item)} className="admin-icon-btn" title={t('admin.addProductInSubcategory')}><FiBox /></Link>
-                      <Link to={`/admin/subcategories/${item.id}`} className="admin-icon-btn"><FiEdit2 /></Link>
-                      <button onClick={() => setPending(item)} className="admin-icon-btn text-red-500"><FiTrash2 /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {items.length === 0 ? (
+        <div className="admin-empty">
+          <p className="text-lg font-black text-gray-800 dark:text-white">{t('admin.emptySubcategories')}</p>
+          <p className="text-sm text-gray-500 mt-2 max-w-md">{t('admin.emptySubcategoriesHint')}</p>
+          <Link to="/admin/subcategories/new" className="admin-primary mt-6">
+            <FiPlus /> {t('admin.addSubcategory')}
+          </Link>
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:hidden gap-3">
+            {items.map((item) => (
+              <article key={item.id} className="admin-card flex gap-3">
+                <img src={mediaUrl(item.image)} alt="" className="w-16 h-16 rounded-xl object-cover bg-gray-100" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold">{item.name}</p>
+                  <p className="text-xs text-gray-500">{item.category_name}</p>
+                  <div className="flex gap-2 mt-2">
+                    <Link to={productLink(item)} className="admin-icon-btn" title={t('admin.addProductInSubcategory')}><FiBox /></Link>
+                    <Link to={`/admin/subcategories/${item.id}`} className="admin-icon-btn"><FiEdit2 /></Link>
+                    <button onClick={() => setPending(item)} className="admin-icon-btn-danger"><FiTrash2 /></button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="hidden md:block admin-table-wrap">
+            <div className="overflow-x-auto">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>{t('admin.subcategories')}</th>
+                    <th>{t('admin.parentCategory')}</th>
+                    <th>{t('admin.sortOrder')}</th>
+                    <th className="text-end">{t('admin.actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <img src={mediaUrl(item.image)} alt="" className="w-12 h-12 rounded-xl object-cover bg-gray-100 ring-1 ring-black/5" />
+                          <div>
+                            <p className="font-bold">{item.name}</p>
+                            <p className="text-xs text-gray-500 line-clamp-1">{item.description}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="text-sm font-medium">{item.category_name}</td>
+                      <td className="text-sm">
+                        <span className="admin-badge-muted">{item.sort_order}</span>
+                      </td>
+                      <td>
+                        <div className="flex justify-end gap-2">
+                          <Link to={productLink(item)} className="admin-icon-btn" title={t('admin.addProductInSubcategory')}><FiBox /></Link>
+                          <Link to={`/admin/subcategories/${item.id}`} className="admin-icon-btn"><FiEdit2 /></Link>
+                          <button onClick={() => setPending(item)} className="admin-icon-btn-danger"><FiTrash2 /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
       <ConfirmDialog
         open={Boolean(pending)}

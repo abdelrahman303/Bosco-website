@@ -12,12 +12,15 @@ import { formatPrice, mediaUrl } from '../../utils/media';
 
 const emptyProduct = {
   name: '',
+  name_ar: '',
   model: '',
   sku: '',
   category_id: '',
   subcategory_id: '',
   short_description: '',
+  short_description_ar: '',
   description: '',
+  description_ar: '',
   image: '',
   gallery: [],
   specs: [{ key: '', value: '' }],
@@ -208,9 +211,12 @@ export default function ProductForm() {
       </div>
 
       {step === 0 && (
-        <SectionCard step="01" title={t('admin.identity')} subtitle={t('admin.nameHint')}>
+        <SectionCard step="01" title={t('admin.identity')} subtitle={t('admin.bilingualHint')}>
           <Field label={t('admin.name')} hint={t('admin.nameHint')}>
             <input className="admin-input text-lg font-semibold" value={form.name} onChange={(e) => update('name', e.target.value)} required />
+          </Field>
+          <Field label={t('admin.nameAr')}>
+            <input className="admin-input text-lg font-semibold" dir="rtl" value={form.name_ar} onChange={(e) => update('name_ar', e.target.value)} />
           </Field>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label={t('admin.model')}>
@@ -223,8 +229,14 @@ export default function ProductForm() {
           <Field label={t('admin.shortDescription')} hint={t('admin.descHint')}>
             <textarea className="admin-input min-h-24" value={form.short_description} onChange={(e) => update('short_description', e.target.value)} />
           </Field>
+          <Field label={t('admin.shortDescriptionAr')}>
+            <textarea className="admin-input min-h-24" dir="rtl" value={form.short_description_ar} onChange={(e) => update('short_description_ar', e.target.value)} />
+          </Field>
           <Field label={t('admin.fullDescription')}>
             <textarea className="admin-input min-h-40" value={form.description} onChange={(e) => update('description', e.target.value)} />
+          </Field>
+          <Field label={t('admin.fullDescriptionAr')}>
+            <textarea className="admin-input min-h-40" dir="rtl" value={form.description_ar} onChange={(e) => update('description_ar', e.target.value)} />
           </Field>
         </SectionCard>
       )}

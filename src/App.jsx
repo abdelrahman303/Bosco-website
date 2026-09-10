@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import Lenis from '@studio-freight/lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useTheme from './hooks/useTheme';
+import useLanguage from './hooks/useLanguage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +24,7 @@ const Home = lazy(() => import('./pages/home/Home'));
 const AboutUs = lazy(() => import('./pages/aboutus/aboutUs'));
 const Categories = lazy(() => import('./pages/category/Categories'));
 const CategoryDetails = lazy(() => import('./pages/category/CategoryDetails'));
+const SubcategoryDetails = lazy(() => import('./pages/category/SubcategoryDetails'));
 const Products = lazy(() => import('./pages/products/Products'));
 const ProductDetails = lazy(() => import('./pages/products/ProductDetails'));
 const Contact = lazy(() => import('./pages/contactus/Contact'));
@@ -34,7 +37,9 @@ const SubcategoriesManagement = lazy(() => import('./pages/dashboard/Subcategori
 const SubcategoryForm = lazy(() => import('./pages/dashboard/SubcategoryForm'));
 const ProductsManagement = lazy(() => import('./pages/dashboard/ProductsManagement'));
 const ProductForm = lazy(() => import('./pages/dashboard/ProductForm'));
-const InquiriesManagement = lazy(() => import('./pages/dashboard/InquiriesManagement'));
+const QuotesManagement = lazy(() => import('./pages/dashboard/QuotesManagement'));
+const EmailServices = lazy(() => import('./pages/dashboard/EmailServices'));
+const EmailHistory = lazy(() => import('./pages/dashboard/EmailHistory'));
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -63,6 +68,9 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  const { isDark } = useTheme();
+  const { isAr } = useLanguage();
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -91,13 +99,13 @@ export default function App() {
       <ScrollToTop />
 
       <Toaster
-        position="top-right"
+        position={isAr ? 'top-left' : 'top-right'}
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#1E1E1E',
-            color: '#fff',
-            border: '1px solid #333',
+            background: isDark ? '#1E1E1E' : '#ffffff',
+            color: isDark ? '#fff' : '#111',
+            border: isDark ? '1px solid #333' : '1px solid #e5e7eb',
           },
           success: {
             iconTheme: {
@@ -115,6 +123,7 @@ export default function App() {
             <Route path="aboutus" element={<AboutUs />} />
             <Route path="about" element={<AboutUs />} />
             <Route path="categories" element={<Categories />} />
+            <Route path="categories/:slug/:subSlug" element={<SubcategoryDetails />} />
             <Route path="categories/:slug" element={<CategoryDetails />} />
             <Route path="products" element={<Products />} />
             <Route path="products/:slug" element={<ProductDetails />} />
@@ -136,7 +145,10 @@ export default function App() {
               <Route path="products" element={<ProductsManagement />} />
               <Route path="products/new" element={<ProductForm />} />
               <Route path="products/:id" element={<ProductForm />} />
-              <Route path="inquiries" element={<InquiriesManagement />} />
+              <Route path="quotes" element={<QuotesManagement />} />
+              <Route path="inquiries" element={<QuotesManagement />} />
+              <Route path="email" element={<EmailServices />} />
+              <Route path="email/history" element={<EmailHistory />} />
             </Route>
           </Route>
 

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
-import { TOKEN_KEY } from '../api/config';
+import { REFRESH_TOKEN_KEY, TOKEN_KEY } from '../api/config';
 import { authService } from '../services/authService';
 
 export const AuthContext = createContext(null);
@@ -9,8 +9,11 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
   const [loading, setLoading] = useState(true);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    await authService.logout(refreshToken);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     setToken(null);
     setAdmin(null);
   }, []);
@@ -30,8 +33,12 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const data = await authService.login(email, password);
-    localStorage.setItem(TOKEN_KEY, data.token);
-    setToken(data.token);
+    const accessToken = data.accessToken || data.token;
+    localStorage.setItem(TOKEN_KEY, accessToken);
+    if (data.refreshToken) {
+      localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+    }
+    setToken(accessToken);
     setAdmin(data.admin);
     return data.admin;
   }, []);

@@ -8,6 +8,7 @@ import ProductCard from '../../components/cards/ProductCard';
 import { inquiryService } from '../../services/inquiryService';
 import { productService } from '../../services/productService';
 import { formatPrice, mediaUrl } from '../../utils/media';
+import { localized } from '../../utils/localize';
 
 export default function ProductDetails() {
   const { t, i18n } = useTranslation();
@@ -29,19 +30,19 @@ export default function ProductDetails() {
         setForm((prev) => ({
           ...prev,
           message: t('site.productDetails.quotePrefill', {
-            name: data.name,
+            name: localized(data, 'name', i18n.language),
             model: data.model || data.sku,
           }),
         }));
       })
       .catch((err) => setError(err.message));
-  }, [slug, t]);
+  }, [slug, t, i18n.language]);
 
   const sendQuote = async (event) => {
     event.preventDefault();
     setSending(true);
     try {
-      const result = await inquiryService.create({ ...form, product_id: product.id });
+      const result = await inquiryService.create({ ...form, product_id: product.id, type: 'quote' });
       toast.success(t('site.contact.success'));
       setForm({ name: '', email: '', company: '', phone: '', message: form.message });
     } catch (err) {
@@ -55,29 +56,43 @@ export default function ProductDetails() {
   if (!product) return <div className="pt-40 pb-24 text-center text-gray-500">{t('site.productDetails.loading')}</div>;
 
   const gallery = [product.image, ...(product.gallery || [])].filter(Boolean);
+  const productName = localized(product, 'name', i18n.language);
+  const productDescription = localized(product, 'description', i18n.language);
+  const categoryName = localized(product.category, 'name', i18n.language);
 
   return (
     <div className="pt-24 sm:pt-32 pb-16 sm:pb-24 bg-[var(--bg)] min-h-screen">
       <Helmet>
-        <title>{product.name} | Bosco International Trade</title>
+        <title>{productName} | Bosco International Trade</title>
       </Helmet>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12">
-        <p className="text-sm text-gray-500 mb-6">
-          <Link to="/products" className="hover:text-[#C63637]">{t('site.common.products')}</Link>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <Link to="/categories" className="hover:text-[#C63637]">{t('site.common.categories')}</Link>
           {product.category && (
             <>
               {' / '}
-              <Link to={`/categories/${product.category.slug}`} className="hover:text-[#C63637]">{product.category.name}</Link>
+              <Link to={`/categories/${product.category.slug}`} className="hover:text-[#C63637]">{categoryName}</Link>
+            </>
+          )}
+          {product.subcategory?.slug && product.category?.slug && (
+            <>
+              {' / '}
+              <Link
+                to={`/categories/${product.category.slug}/${product.subcategory.slug}`}
+                className="hover:text-[#C63637]"
+              >
+                {localized(product.subcategory, 'name', i18n.language)}
+              </Link>
             </>
           )}
           {' / '}
-          <span>{product.name}</span>
+          <span>{productName}</span>
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-7">
             <div className="rounded-[22px] sm:rounded-[32px] overflow-hidden bg-black min-h-[260px] sm:min-h-[420px]">
-              <img src={mediaUrl(activeImage)} alt={product.name} className="w-full h-[260px] sm:h-[520px] object-cover" />
+              <img src={mediaUrl(activeImage)} alt={productName} className="w-full h-[260px] sm:h-[520px] object-cover" />
             </div>
             <div className="flex gap-3 mt-4 overflow-x-auto">
               {gallery.map((url) => (
@@ -89,16 +104,16 @@ export default function ProductDetails() {
           </div>
 
           <div className="lg:col-span-5">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#C63637]">{product.category?.name}</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mt-3 leading-tight">{product.name}</h1>
-            <p className="text-gray-500 mt-2">{product.model} · {product.sku}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#C63637]">{categoryName}</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mt-3 leading-tight text-gray-900 dark:text-white">{productName}</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{product.model} · {product.sku}</p>
             <p className="text-2xl font-black text-[#C63637] mt-5">
               {formatPrice(product, {
                 quoteLabel: t('site.common.requestQuote'),
                 locale: i18n.language?.startsWith('ar') ? 'ar-EG' : 'en-US',
               })}
             </p>
-            <p className="text-gray-600 dark:text-gray-300 mt-5 leading-relaxed">{product.description}</p>
+            <p className="text-gray-600 dark:text-gray-300 mt-5 leading-relaxed">{productDescription}</p>
 
             <div className="grid grid-cols-2 gap-3 mt-8">
               {[

@@ -2,32 +2,27 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import ProductCard from '../../components/cards/ProductCard';
+import { FiArrowRight, FiLayers } from 'react-icons/fi';
 import { categoryService } from '../../services/categoryService';
-import { productService } from '../../services/productService';
 import { mediaUrl } from '../../utils/media';
+import { localized } from '../../utils/localize';
 
 export default function CategoryDetails() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
   const [category, setCategory] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [activeSub, setActiveSub] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setActiveSub('');
     categoryService
       .get(slug)
-      .then((data) => {
-        setCategory(data);
-        return productService.list({ categoryId: data.id });
-      })
-      .then(setProducts)
+      .then(setCategory)
       .catch((err) => setError(err.message));
   }, [slug]);
 
-  const visible = activeSub ? products.filter((item) => String(item.subcategory_id) === String(activeSub)) : products;
+  const categoryName = localized(category, 'name', i18n.language);
+  const categoryDescription = localized(category, 'description', i18n.language);
+  const subs = category?.subcategories || [];
 
   if (error) {
     return <div className="pt-40 pb-24 text-center text-red-500">{error}</div>;
@@ -40,67 +35,94 @@ export default function CategoryDetails() {
   return (
     <div className="bg-[var(--bg)] min-h-screen">
       <Helmet>
-        <title>{category.name} | Bosco International Trade</title>
+        <title>{categoryName} | Bosco International Trade</title>
       </Helmet>
-      <section className="relative min-h-[52vh] flex items-end">
-        <img src={mediaUrl(category.image)} alt={category.name} className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+
+      <section className="relative min-h-[48vh] flex items-end">
+        <img src={mediaUrl(category.image)} alt={categoryName} className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25" />
         <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 pb-10 sm:pb-16 pt-28 sm:pt-36 w-full">
-          <p className="text-[#C63637] text-xs font-bold uppercase tracking-[0.25em] mb-3">{t('site.common.category')}</p>
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tight">{category.name}</h1>
-          <p className="text-gray-300 text-lg max-w-2xl mt-4">{category.description}</p>
+          <nav className="flex flex-wrap items-center gap-2 text-sm text-white/70 mb-5">
+            <Link to="/categories" className="hover:text-white">
+              {t('site.common.categories')}
+            </Link>
+            <span>/</span>
+            <span className="text-white font-semibold">{categoryName}</span>
+          </nav>
+          <p className="text-[#C63637] text-xs font-bold uppercase tracking-[0.25em] mb-3">
+            {t('site.common.category')}
+          </p>
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tight">{categoryName}</h1>
+          <p className="text-gray-300 text-lg max-w-2xl mt-4">{categoryDescription}</p>
+          <p className="text-white/70 text-sm mt-4 font-semibold">
+            {t('site.categoryDetails.subCount', { count: subs.length })}
+          </p>
         </div>
       </section>
 
       <section className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-16">
-        <div className="flex flex-wrap gap-3 mb-10">
-          <button
-            onClick={() => setActiveSub('')}
-            className={`px-5 py-2.5 rounded-full text-sm font-bold ${!activeSub ? 'bg-[#C63637] text-white' : 'bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/10'}`}
-          >
-            {t('site.common.allProducts')}
-          </button>
-          {(category.subcategories || []).map((sub) => (
-            <button
-              key={sub.id}
-              onClick={() => setActiveSub(sub.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold ${String(activeSub) === String(sub.id) ? 'bg-[#C63637] text-white' : 'bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/10'}`}
-            >
-              {sub.name}
-            </button>
-          ))}
-        </div>
-
-        {(category.subcategories || []).length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
-            {category.subcategories.map((sub) => (
-              <button
-                key={sub.id}
-                onClick={() => setActiveSub(sub.id)}
-                className="text-left rounded-3xl overflow-hidden bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/5"
-              >
-                <img src={mediaUrl(sub.image)} alt={sub.name} className="w-full h-40 object-cover" />
-                <div className="p-5">
-                  <h3 className="text-xl font-black">{sub.name}</h3>
-                  <p className="text-sm text-gray-500 mt-2 line-clamp-2">{sub.description}</p>
-                </div>
-              </button>
-            ))}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#C63637]">
+              {t('site.categoryDetails.subsKicker')}
+            </p>
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight mt-2">
+              {t('site.categoryDetails.subsTitle')}
+            </h2>
+            <p className="text-gray-500 mt-2 max-w-xl">{t('site.categoryDetails.subsLead')}</p>
           </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {visible.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
         </div>
 
-        {visible.length === 0 && (
-          <div className="text-center py-16 text-gray-500">
-            {t('site.categoryDetails.empty')} {t('site.categoryDetails.emptyHint')}
+        {subs.length === 0 ? (
+          <div className="rounded-[28px] border border-dashed border-gray-300 dark:border-white/10 py-16 text-center">
+            <FiLayers className="mx-auto text-3xl text-gray-400 mb-3" />
+            <p className="text-xl font-black">{t('site.categoryDetails.emptySubs')}</p>
+            <p className="text-gray-500 mt-2">{t('site.categoryDetails.emptyHint')}</p>
             <div className="mt-4">
-              <Link to="/admin/login" className="text-[#C63637] font-bold">{t('site.categoryDetails.goAdmin')}</Link>
+              <Link to="/admin/login" className="text-[#C63637] font-bold">
+                {t('site.categoryDetails.goAdmin')}
+              </Link>
             </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+            {subs.map((sub) => {
+              const subName = localized(sub, 'name', i18n.language);
+              const subDescription = localized(sub, 'description', i18n.language);
+              return (
+                <Link
+                  key={sub.id}
+                  to={`/categories/${category.slug}/${sub.slug}`}
+                  className="group rounded-[28px] overflow-hidden bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/10 hover:-translate-y-1 transition-transform duration-300"
+                >
+                  <div className="relative h-48 bg-[#111]">
+                    <img
+                      src={mediaUrl(sub.image)}
+                      alt={subName}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <span className="absolute bottom-3 start-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">
+                      {t('site.common.subcategory')}
+                    </span>
+                  </div>
+                  <div className="p-5 sm:p-6 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-xl font-black text-gray-900 dark:text-white">{subName}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">{subDescription}</p>
+                      {typeof sub.product_count === 'number' && (
+                        <p className="text-xs font-bold text-gray-400 mt-3">
+                          {t('site.categoryDetails.productCount', { count: sub.product_count })}
+                        </p>
+                      )}
+                    </div>
+                    <span className="shrink-0 w-10 h-10 rounded-full bg-[#C63637]/10 text-[#C63637] flex items-center justify-center group-hover:bg-[#C63637] group-hover:text-white transition-colors">
+                      <FiArrowRight className="rtl:rotate-180" />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

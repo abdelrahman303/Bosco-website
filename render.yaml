@@ -16,5 +16,11 @@ services:
         value: production
       - key: JWT_SECRET
         generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
       - key: ADMIN_EMAIL
-        value: rana.fathi.rana@gmail.com
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://abdelrahman303.github.io

@@ -128,21 +128,21 @@ export default function UserNavbar() {
   }, []);
 
   return (
-    <div ref={navRef} className="fixed top-0 left-0 w-full z-[100] px-3 sm:px-6 pt-3 sm:pt-6 pointer-events-none">
+    <div ref={navRef} className="fixed top-0 inset-x-0 w-full z-[100] px-3 sm:px-6 pt-3 sm:pt-4 pointer-events-none">
       <div className="nav-pill pointer-events-auto max-w-6xl mx-auto bg-white/70 dark:bg-[#0a0a0a]/70 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-full px-3 py-1.5 sm:px-6 sm:py-3 flex items-center justify-between transition-colors duration-500">
         <motion.div className="nav-item" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
           <Logo />
         </motion.div>
 
         {/* DESKTOP LINKS */}
-        <div className="hidden lg:flex items-center space-x-1">
+        <div className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
               <MagneticButton key={link.name}>
                 <Link
                   to={link.path}
-                  className={`nav-item relative px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                  className={`nav-item relative px-5 py-2 rounded-full text-md font-semibold transition-all duration-300 ${
                     isActive
                       ? 'text-white bg-[#C63637] shadow-lg shadow-[#C63637]/30'
                       : 'text-[#4E4E4E] dark:text-gray-300 hover:text-[#C63637] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
@@ -211,7 +211,7 @@ export default function UserNavbar() {
                 <button
                   onClick={() => setIsOpen(false)}
                   className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-white/10 text-[#4E4E4E] dark:text-white rounded-full"
-                  aria-label="Close menu"
+                  aria-label={t('nav.closeMenu')}
                 >
                   <FiX size={20} />
                 </button>
@@ -223,7 +223,7 @@ export default function UserNavbar() {
                   return (
                     <motion.div
                       key={link.path}
-                      initial={{ opacity: 0, x: -16 }}
+                      initial={{ opacity: 0, x: document.documentElement.dir === 'rtl' ? 16 : -16 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.06 + i * 0.05, duration: 0.35, ease: 'easeOut' }}
                     >

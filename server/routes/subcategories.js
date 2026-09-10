@@ -31,8 +31,10 @@ subcategories.post('/', requireAdmin, async (c) => {
   const result = queries.insertSubcategory.run(
     Number(body.category_id),
     body.name.trim(),
+    (body.name_ar || '').trim(),
     uniqueSlug('subcategories', body.slug || body.name),
     body.description || '',
+    body.description_ar || '',
     body.image || '',
     toInt(body.sort_order, 0)
   );
@@ -54,8 +56,10 @@ subcategories.put('/:id', requireAdmin, async (c) => {
   queries.updateSubcategory.run(
     categoryId,
     body.name?.trim() || existing.name,
+    body.name_ar != null ? String(body.name_ar).trim() : existing.name_ar || '',
     uniqueSlug('subcategories', body.slug || body.name || existing.name, id),
     body.description ?? existing.description,
+    body.description_ar != null ? body.description_ar : existing.description_ar || '',
     body.image ?? existing.image,
     toInt(body.sort_order, existing.sort_order),
     id

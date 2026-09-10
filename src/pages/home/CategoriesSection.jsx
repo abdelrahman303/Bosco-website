@@ -7,11 +7,12 @@ import { FiArrowUpRight } from 'react-icons/fi';
 import SafeImage from '../../components/SafeImage';
 import { categoryService } from '../../services/categoryService';
 import { CategoryIcon, bentoSpan } from '../../utils/icons';
+import { localized } from '../../utils/localize';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function CategoriesSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState([]);
   const sectionRef = useRef(null);
 
@@ -88,7 +89,7 @@ export default function CategoriesSection() {
 
   const tickerFallback = t('site.domains.ticker', { returnObjects: true });
   const ticker = categories.length
-    ? [...categories, ...categories].map((cat) => cat.name)
+    ? [...categories, ...categories].map((cat) => localized(cat, 'name', i18n.language))
     : Array.isArray(tickerFallback) ? tickerFallback : [];
 
   return (
@@ -144,7 +145,7 @@ export default function CategoriesSection() {
               <div className="absolute inset-0 overflow-hidden">
                 <SafeImage
                   src={cat.image}
-                  alt={cat.name}
+                  alt={localized(cat, 'name', i18n.language)}
                   width={1100}
                   className="cat-media w-full h-full object-cover opacity-70 group-hover:opacity-90"
                 />
@@ -163,12 +164,12 @@ export default function CategoriesSection() {
                 </div>
                 <div>
                   <div className="flex items-end justify-between gap-2 sm:gap-3">
-                    <h3 className="text-sm sm:text-2xl md:text-3xl font-black tracking-tight leading-tight line-clamp-2">{cat.name}</h3>
+                    <h3 className="text-sm sm:text-2xl md:text-3xl font-black tracking-tight leading-tight line-clamp-2">{localized(cat, 'name', i18n.language)}</h3>
                     <span className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-[#C63637] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <FiArrowUpRight size={14} />
+                      <FiArrowUpRight size={14} className="rtl:rotate-180" />
                     </span>
                   </div>
-                  <p className="hidden sm:block text-white/75 text-sm mt-2 line-clamp-2 max-w-md">{cat.description}</p>
+                  <p className="hidden sm:block text-white/75 text-sm mt-2 line-clamp-2 max-w-md">{localized(cat, 'description', i18n.language)}</p>
                 </div>
               </div>
             </Link>

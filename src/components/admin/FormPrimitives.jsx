@@ -18,9 +18,9 @@ export function Field({ label, hint, children }) {
 export function SectionCard({ step, title, subtitle, children }) {
   return (
     <section className="admin-card overflow-hidden p-0">
-      <div className="px-5 sm:px-7 py-5 border-b border-gray-100 dark:border-white/5 flex items-start gap-4">
+      <div className="px-5 sm:px-7 py-5 border-b border-gray-100 dark:border-white/5 flex items-start gap-4 bg-gradient-to-r from-gray-50/80 to-transparent dark:from-white/[0.03]">
         {step && (
-          <span className="w-9 h-9 rounded-2xl bg-[#C63637] text-white text-sm font-black flex items-center justify-center shrink-0">
+          <span className="w-9 h-9 rounded-2xl bg-[#C63637] text-white text-sm font-black flex items-center justify-center shrink-0 shadow-md shadow-[#C63637]/25">
             {step}
           </span>
         )}
@@ -39,7 +39,7 @@ export function ToggleRow({ checked, onChange, title, subtitle }) {
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="w-full flex items-center justify-between gap-4 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-4 text-start"
+      className="w-full flex items-center justify-between gap-4 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-4 text-start hover:border-[#C63637]/30 transition-colors"
     >
       <span>
         <span className="block text-sm font-bold">{title}</span>
@@ -63,14 +63,14 @@ export function FormStudio({ eyebrow, title, subtitle, backTo, cancelLabel, save
               {cancelLabel}
             </Link>
           )}
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#C63637]">{eyebrow}</p>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight mt-1 text-start">{title}</h1>
-          {subtitle && <p className="text-gray-500 mt-2 max-w-2xl text-start">{subtitle}</p>}
+          <p className="admin-eyebrow">{eyebrow}</p>
+          <h1 className="admin-title">{title}</h1>
+          {subtitle && <p className="admin-subtitle">{subtitle}</p>}
         </div>
         <div className="hidden sm:flex flex-wrap justify-end gap-3 shrink-0">
           {extraAction}
           {backTo && (
-            <Link to={backTo} className="px-5 py-3 rounded-2xl border border-gray-200 dark:border-white/10 font-semibold hover:bg-white dark:hover:bg-white/5">
+            <Link to={backTo} className="admin-secondary">
               {cancelLabel}
             </Link>
           )}
@@ -85,11 +85,11 @@ export function FormStudio({ eyebrow, title, subtitle, backTo, cancelLabel, save
         {preview && <div className="xl:sticky xl:top-24 h-fit">{preview}</div>}
       </div>
 
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-[#111]/95 backdrop-blur border-t border-gray-200 dark:border-white/10 p-3 space-y-2">
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-[#111]/95 backdrop-blur border-t border-gray-200 dark:border-white/10 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] space-y-2 shadow-[0_-12px_40px_-20px_rgba(0,0,0,0.35)]">
         {extraAction && <div className="flex">{extraAction}</div>}
         <div className="flex gap-3">
           {backTo && (
-            <Link to={backTo} className="flex-1 text-center py-3 rounded-2xl border border-gray-200 dark:border-white/10 font-semibold">
+            <Link to={backTo} className="admin-secondary flex-1">
               {cancelLabel}
             </Link>
           )}
@@ -105,7 +105,7 @@ export function FormStudio({ eyebrow, title, subtitle, backTo, cancelLabel, save
 export function LivePreview({ title, children }) {
   return (
     <div className="admin-card p-0 overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 dark:border-white/5">
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-white/5 bg-gradient-to-r from-[#C63637]/5 to-transparent">
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C63637]">{title}</p>
       </div>
       <div className="p-4">{children}</div>

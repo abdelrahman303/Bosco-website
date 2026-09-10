@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FiArrowUpRight, FiFacebook, FiLinkedin, FiMail, FiMapPin, FiPhone, FiYoutube } from 'react-icons/fi';
+import { FiArrowUpRight, FiFacebook, FiLinkedin, FiMail, FiMapPin, FiPhone } from 'react-icons/fi';
 import Logo from './Logo';
+import { COMPANY } from '../utils/company';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const socials = [
-  { href: 'https://www.linkedin.com', icon: FiLinkedin, label: 'LinkedIn' },
-  { href: 'https://www.facebook.com', icon: FiFacebook, label: 'Facebook' },
-  { href: 'https://www.youtube.com', icon: FiYoutube, label: 'YouTube' },
+  { href: COMPANY.linkedin, icon: FiLinkedin, label: 'LinkedIn' },
+  { href: COMPANY.facebook, icon: FiFacebook, label: 'Facebook' },
 ];
 
 export default function UserFooter() {
@@ -75,7 +75,7 @@ export default function UserFooter() {
 
         <div className="grid grid-cols-2 xl:grid-cols-12 gap-6 sm:gap-12 py-7 sm:py-16 lg:py-20">
           <div className="footer-reveal col-span-2 xl:col-span-5 space-y-3 sm:space-y-6">
-            <Logo onDark />
+            <Logo onDark size="footer" />
             <p className="hidden sm:block text-gray-400 max-w-md leading-relaxed">
               {t('site.footer.blurb')}
             </p>
@@ -126,20 +126,28 @@ export default function UserFooter() {
 
           <div className="footer-reveal col-span-2 xl:col-span-3 space-y-2 sm:space-y-4">
             <h3 className="text-white font-black mb-3 sm:mb-5 text-[11px] sm:text-sm uppercase tracking-[0.2em]">{t('site.footer.desk')}</h3>
-            <a href="https://maps.google.com/?q=Alexandria,Egypt" className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
+            <a href={COMPANY.maps} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
               <FiMapPin className="text-[#C63637] mt-0.5 shrink-0" /> {t('site.footer.city')}
             </a>
-            <a href="tel:+201000000000" className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
-              <FiPhone className="text-[#C63637] shrink-0" /> +20 100 000 0000
+            <a href={`tel:${COMPANY.phoneTel}`} className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
+              <FiPhone className="text-[#C63637] shrink-0" /> {COMPANY.phoneDisplay}
             </a>
-            <a href="mailto:sales@bosco-trade.com" className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
-              <FiMail className="text-[#C63637] shrink-0" /> sales@bosco-trade.com
+            <a href={`mailto:${COMPANY.email}`} className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-400 hover:text-white">
+              <FiMail className="text-[#C63637] shrink-0" /> {COMPANY.email}
+            </a>
+            <a
+              href={COMPANY.whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[#25D366] hover:text-white"
+            >
+              WhatsApp · {COMPANY.phoneDisplay}
             </a>
           </div>
         </div>
 
         <p className="footer-reveal pointer-events-none select-none hidden sm:block text-[18vw] leading-none font-black tracking-tighter text-white/[0.04] text-center -mb-6">
-          BOSCO
+        {t('site.footer.bosco')}
         </p>
 
         <div className="footer-reveal border-t border-white/10 py-4 sm:py-6 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] sm:text-sm text-gray-500">

@@ -1,6 +1,8 @@
 export const endpoints = {
   health: '/health',
   login: '/auth/login',
+  refresh: '/auth/refresh',
+  logout: '/auth/logout',
   me: '/auth/me',
   stats: '/admin/stats',
   upload: '/admin/upload',
@@ -11,4 +13,10 @@ export const endpoints = {
   products: '/products',
   product: (id) => `/products/${id}`,
   inquiries: '/inquiries',
+  inquiry: (id) => `/inquiries/${id}`,
+  inquiryStatus: (id) => `/inquiries/${id}/status`,
+  mailStatus: '/admin/mail/status',
+  mailHistory: '/admin/mail/history',
+  mailSend: '/admin/mail/send',
+  mailResend: (id) => `/admin/mail/resend/${id}`,
 };

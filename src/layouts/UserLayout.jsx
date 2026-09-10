@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import UserNavbar from '../components/Navbar';
 import UserFooter from '../components/UserFooter';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,12 +19,13 @@ export default function UserLayout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-bosco-dark text-bosco-gray dark:text-gray-200 font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans transition-colors duration-300">
       <UserNavbar />
       <main className="min-h-screen page-transition">
         <Outlet />
       </main>
       <UserFooter />
+      {/* <WhatsAppButton /> */}
     </div>
   );
 }

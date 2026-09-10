@@ -20,11 +20,18 @@ function productPayload(body, existing = {}) {
     category_id: categoryId,
     subcategory_id: subcategoryId,
     name: (body.name || existing.name || '').trim(),
+    name_ar: body.name_ar != null ? String(body.name_ar).trim() : existing.name_ar || '',
     slug: uniqueSlug('products', body.slug || body.name || existing.name, existing.id),
     model: body.model ?? existing.model ?? '',
     sku: body.sku ?? existing.sku ?? '',
     short_description: body.short_description ?? existing.short_description ?? '',
+    short_description_ar:
+      body.short_description_ar != null
+        ? body.short_description_ar
+        : existing.short_description_ar || '',
     description: body.description ?? existing.description ?? '',
+    description_ar:
+      body.description_ar != null ? body.description_ar : existing.description_ar || '',
     image: body.image ?? existing.image ?? '',
     gallery: safeJson(body.gallery, existing.gallery ? JSON.parse(existing.gallery || '[]') : []),
     specs: safeJson(body.specs, existing.specs ? JSON.parse(existing.specs || '{}') : {}),
@@ -73,10 +80,24 @@ products.get('/', async (c) => {
   });
 });
 
-products.get('/:slug', (c) => {
+products.get('/:slug', async (c) => {
   const slug = c.req.param('slug');
   const product = queries.productBySlug.get(slug) || queries.productById.get(Number(slug));
   if (!product) return c.json({ message: 'Product not found.' }, 404);
+
+  if (product.status !== 'published') {
+    const header = c.req.header('Authorization') || '';
+    if (!header.startsWith('Bearer ')) {
+      return c.json({ message: 'Product not found.' }, 404);
+    }
+    try {
+      const { verifyToken } = await import('../lib/auth.js');
+      verifyToken(header.slice(7));
+    } catch {
+      return c.json({ message: 'Product not found.' }, 404);
+    }
+  }
+
   return c.json({
     data: mapProduct(product),
     similar: similarProducts(product),
@@ -93,11 +114,14 @@ products.post('/', requireAdmin, async (c) => {
       payload.category_id,
       payload.subcategory_id,
       payload.name,
+      payload.name_ar,
       payload.slug,
       payload.model,
       payload.sku,
       payload.short_description,
+      payload.short_description_ar,
       payload.description,
+      payload.description_ar,
       payload.image,
       payload.gallery,
       payload.specs,
@@ -134,11 +158,14 @@ products.put('/:id', requireAdmin, async (c) => {
       payload.category_id,
       payload.subcategory_id,
       payload.name,
+      payload.name_ar,
       payload.slug,
       payload.model,
       payload.sku,
       payload.short_description,
+      payload.short_description_ar,
       payload.description,
+      payload.description_ar,
       payload.image,
       payload.gallery,
       payload.specs,

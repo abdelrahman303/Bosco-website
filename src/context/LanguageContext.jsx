@@ -1,5 +1,6 @@
 import { createContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export const LanguageContext = createContext(null);
 
@@ -10,6 +11,7 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     document.documentElement.lang = isAr ? 'ar' : 'en';
     document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+    requestAnimationFrame(() => ScrollTrigger.refresh());
   }, [isAr]);
 
   const value = useMemo(

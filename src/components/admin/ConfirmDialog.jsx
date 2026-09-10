@@ -33,7 +33,7 @@ export default function ConfirmDialog({
             type="button"
             disabled={loading}
             onClick={onConfirm}
-            className="flex-1 py-3.5 rounded-2xl bg-[#C63637] text-white font-bold shadow-lg shadow-[#C63637]/25 disabled:opacity-60"
+            className="admin-primary flex-1 justify-center"
           >
             {loading ? '...' : confirmLabel}
           </button>

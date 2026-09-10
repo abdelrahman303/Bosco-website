@@ -11,8 +11,10 @@ import { mediaUrl } from '../../utils/media';
 
 const emptyForm = {
   name: '',
+  name_ar: '',
   category_id: '',
   description: '',
+  description_ar: '',
   image: '',
   sort_order: 0,
 };
@@ -42,8 +44,10 @@ export default function SubcategoryForm() {
       .then((data) => {
         setForm({
           name: data.name || '',
+          name_ar: data.name_ar || '',
           category_id: data.category_id || '',
           description: data.description || '',
+          description_ar: data.description_ar || '',
           image: data.image || '',
           sort_order: data.sort_order || 0,
         });
@@ -147,12 +151,18 @@ export default function SubcategoryForm() {
         </div>
       </SectionCard>
 
-      <SectionCard step="02" title={t('admin.identity')} subtitle={t('admin.nameHint')}>
+      <SectionCard step="02" title={t('admin.identity')} subtitle={t('admin.bilingualHint')}>
         <Field label={t('admin.name')} hint={t('admin.nameHint')}>
           <input className="admin-input text-lg font-semibold" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
         </Field>
+        <Field label={t('admin.nameAr')}>
+          <input className="admin-input text-lg font-semibold" dir="rtl" value={form.name_ar} onChange={(e) => setForm({ ...form, name_ar: e.target.value })} />
+        </Field>
         <Field label={t('admin.description')} hint={t('admin.descHint')}>
           <textarea className="admin-input min-h-28" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+        </Field>
+        <Field label={t('admin.descriptionAr')}>
+          <textarea className="admin-input min-h-28" dir="rtl" value={form.description_ar} onChange={(e) => setForm({ ...form, description_ar: e.target.value })} />
         </Field>
         <Field label={t('admin.sortOrder')}>
           <input type="number" className="admin-input max-w-[160px]" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} />
