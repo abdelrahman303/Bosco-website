@@ -1,10 +1,18 @@
-export function scrollToTop(smooth = true) {
+export function scrollToTop(smooth = false) {
   const lenis = window.__boscoLenis;
   if (lenis) {
-    lenis.scrollTo(0, { duration: smooth ? 1.15 : 0, immediate: !smooth });
-    return;
+    lenis.scrollTo(0, { duration: smooth ? 0.85 : 0, immediate: !smooth });
   }
-  window.scrollTo({ top: 0, left: 0, behavior: smooth ? 'smooth' : 'auto' });
+
+  const behavior = smooth ? 'smooth' : 'auto';
+  try {
+    window.scrollTo({ top: 0, left: 0, behavior });
+  } catch {
+    window.scrollTo(0, 0);
+  }
+
+  if (document.documentElement) document.documentElement.scrollTop = 0;
+  if (document.body) document.body.scrollTop = 0;
 }
 
 export function onAppScroll(handler) {

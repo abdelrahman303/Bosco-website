@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, useLayoutEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Lenis from '@studio-freight/lenis';
@@ -42,11 +42,36 @@ const EmailServices = lazy(() => import('./pages/dashboard/EmailServices'));
 const EmailHistory = lazy(() => import('./pages/dashboard/EmailHistory'));
 
 function ScrollToTop() {
-  const { pathname, search } = useLocation();
+  const { pathname, search, hash } = useLocation();
 
   useEffect(() => {
-    scrollToTop(true);
-  }, [pathname, search]);
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  // Jump to top before paint on every route change (skip in-page hash anchors).
+  useLayoutEffect(() => {
+    if (hash) return;
+    scrollToTop(false);
+  }, [pathname, search, hash]);
+
+  // Lazy pages load after the first paint — re-assert top a few times.
+  useEffect(() => {
+    if (hash) return undefined;
+
+    scrollToTop(false);
+    const frames = [
+      requestAnimationFrame(() => scrollToTop(false)),
+      requestAnimationFrame(() => requestAnimationFrame(() => scrollToTop(false))),
+    ];
+    const timers = [50, 150, 350].map((ms) => setTimeout(() => scrollToTop(false), ms));
+
+    return () => {
+      frames.forEach((id) => cancelAnimationFrame(id));
+      timers.forEach((id) => clearTimeout(id));
+    };
+  }, [pathname, search, hash]);
 
   useEffect(() => {
     const onClick = (event) => {
@@ -57,7 +82,8 @@ function ScrollToTop() {
       if (url.origin !== window.location.origin) return;
       if (url.hash) return;
 
-      requestAnimationFrame(() => scrollToTop(true));
+      scrollToTop(false);
+      requestAnimationFrame(() => scrollToTop(false));
     };
 
     document.addEventListener('click', onClick);
