@@ -72,11 +72,20 @@ export default function App() {
   const { isAr } = useLanguage();
 
   useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+    const isNarrow = window.matchMedia('(max-width: 1024px)').matches;
+    // Smooth scroll + perpetual RAF is expensive on phones; keep native scroll there.
+    if (prefersReduced || isCoarse || isNarrow) {
+      window.__boscoLenis = null;
+      return undefined;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      touchMultiplier: 2,
+      touchMultiplier: 1.2,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
@@ -84,7 +93,6 @@ export default function App() {
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
     window.__boscoLenis = lenis;
 
     return () => {

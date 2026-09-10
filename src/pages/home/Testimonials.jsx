@@ -62,21 +62,26 @@ export default function Testimonials() {
         }
       );
 
-      if (rowA.current) {
-        gsap.to(rowA.current, { xPercent: -50, duration: 32, repeat: -1, ease: 'none' });
-      }
-      if (rowB.current) {
-        gsap.fromTo(rowB.current, { xPercent: -50 }, { xPercent: 0, duration: 36, repeat: -1, ease: 'none' });
-      }
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
 
-      gsap.to('.success-glow', {
-        scale: 1.12,
-        opacity: 0.85,
-        duration: 2.2,
-        yoyo: true,
-        repeat: -1,
-        ease: 'sine.inOut',
-      });
+      // Infinite marquees + pulsing blur glow are costly on phones.
+      if (!reduceMotion && !isMobile) {
+        if (rowA.current) {
+          gsap.to(rowA.current, { xPercent: -50, duration: 32, repeat: -1, ease: 'none' });
+        }
+        if (rowB.current) {
+          gsap.fromTo(rowB.current, { xPercent: -50 }, { xPercent: 0, duration: 36, repeat: -1, ease: 'none' });
+        }
+        gsap.to('.success-glow', {
+          scale: 1.12,
+          opacity: 0.85,
+          duration: 2.2,
+          yoyo: true,
+          repeat: -1,
+          ease: 'sine.inOut',
+        });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -101,7 +106,7 @@ export default function Testimonials() {
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden py-14 sm:py-20 lg:py-32 bg-[#080808] text-white">
-      <div className="success-glow absolute top-1/3 left-1/2 -translate-x-1/2 w-[520px] h-[520px] bg-[#C63637]/20 blur-[140px] rounded-full pointer-events-none" />
+      <div className="success-glow absolute top-1/3 left-1/2 -translate-x-1/2 w-[520px] h-[520px] bg-[#C63637]/20 blur-3xl md:blur-[140px] rounded-full pointer-events-none hidden sm:block" />
 
       <div className="success-head relative z-10 max-w-[1100px] mx-auto px-4 text-center mb-12">
         <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#C63637] mb-4">{t('site.success.kicker')}</p>
@@ -132,14 +137,14 @@ export default function Testimonials() {
         </div>
       </div>
 
-      <div className="relative z-10 overflow-hidden mb-5">
+      <div className="relative z-10 overflow-hidden mb-5 hidden md:block">
         <div ref={rowA} className="flex w-max gap-5 px-4">
           {loop.map((review, index) => (
             <ReviewCard key={`a-${review.id}-${index}`} review={review} />
           ))}
         </div>
       </div>
-      <div className="relative z-10 overflow-hidden">
+      <div className="relative z-10 overflow-hidden hidden md:block">
         <div ref={rowB} className="flex w-max gap-5 px-4">
           {loop.map((review, index) => (
             <ReviewCard key={`b-${review.id}-${index}`} review={review} />

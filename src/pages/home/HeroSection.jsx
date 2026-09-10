@@ -3,22 +3,46 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import gsap from 'gsap';
 import { FiArrowRight, FiArrowUpRight } from 'react-icons/fi';
-import { logoForLanguage } from '../../utils/logo';
 
-const SLIDE_IMAGES = [
-  'https://images.unsplash.com/photo-1581092335397-9583eb92d232?q=80&w=2400&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=2400&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2400&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2400&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2400&auto=format&fit=crop',
+const SLIDE_IDS = [
+  'photo-1581092335397-9583eb92d232',
+  'photo-1532187863486-abf9dbad1b69',
+  'photo-1581091226825-a6a2a5aee158',
+  'photo-1581092160562-40aa08e78837',
+  'photo-1586528116311-ad8dd3c8310d',
 ];
 
+function slideUrl(id, width) {
+  return `https://images.unsplash.com/${id}?q=75&w=${width}&auto=format&fit=crop`;
+}
+
+function useIsMobilePerf() {
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 768px), (pointer: coarse)').matches
+      : false
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px), (pointer: coarse)');
+    const onChange = () => setMobile(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+
+  return mobile;
+}
+
 export default function HeroSection() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const isMobile = useIsMobilePerf();
   const [current, setCurrent] = useState(0);
+  const [loaded, setLoaded] = useState(() => new Set([0]));
   const texts = t('site.hero.slides', { returnObjects: true }) || [];
-  const slides = SLIDE_IMAGES.map((img, index) => ({
-    img,
+  const imageWidth = isMobile ? 960 : 1800;
+  const slides = SLIDE_IDS.map((id, index) => ({
+    id,
+    img: slideUrl(id, imageWidth),
     ...(texts[index] || {}),
   }));
 
@@ -27,19 +51,19 @@ export default function HeroSection() {
   const progressRef = useRef(null);
   const currentRef = useRef(0);
   const fadingRef = useRef(false);
-  const logoSrc = logoForLanguage(i18n.language);
 
   const goToSlide = (index) => {
     const next = ((index % slides.length) + slides.length) % slides.length;
     if (next === currentRef.current || fadingRef.current) return;
     fadingRef.current = true;
+    setLoaded((prev) => new Set([...prev, next, (next + 1) % slides.length]));
 
     const copy = contentRef.current?.querySelectorAll('.hero-copy > *');
     gsap.to(copy || [], {
-      y: 18,
+      y: isMobile ? 10 : 18,
       autoAlpha: 0,
-      duration: 0.35,
-      stagger: 0.03,
+      duration: isMobile ? 0.22 : 0.35,
+      stagger: 0.02,
       ease: 'power2.in',
       overwrite: true,
       onComplete: () => setCurrent(next),
@@ -48,15 +72,17 @@ export default function HeroSection() {
 
   useEffect(() => {
     currentRef.current = current;
+    setLoaded((prev) => new Set([...prev, current, (current + 1) % slides.length]));
+
     const copy = contentRef.current?.querySelectorAll('.hero-copy > *');
     gsap.fromTo(
       copy || [],
-      { y: 28, autoAlpha: 0 },
+      { y: isMobile ? 14 : 28, autoAlpha: 0 },
       {
         y: 0,
         autoAlpha: 1,
-        duration: 0.7,
-        stagger: 0.07,
+        duration: isMobile ? 0.45 : 0.7,
+        stagger: 0.05,
         ease: 'power3.out',
         overwrite: true,
         onComplete: () => {
@@ -73,30 +99,20 @@ export default function HeroSection() {
         { scaleX: 1, duration: 7, ease: 'none', transformOrigin: 'left center' }
       );
     }
-  }, [current]);
+  }, [current, isMobile, slides.length]);
 
   useEffect(() => {
     const timer = setInterval(() => goToSlide(currentRef.current + 1), 7000);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, [slides.length, isMobile]);
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.hero-brand',
-        { y: 24, autoAlpha: 0 },
-        { y: 0, autoAlpha: 1, duration: 1, ease: 'power3.out', delay: 0.15 }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  useLayoutEffect(() => {
+    if (isMobile) return undefined;
     const media = sectionRef.current?.querySelector('.hero-media-active');
-    if (!media) return;
-    gsap.fromTo(media, { scale: 1.1 }, { scale: 1, duration: 7.5, ease: 'sine.out' });
-  }, [current]);
+    if (!media) return undefined;
+    const tween = gsap.fromTo(media, { scale: 1.08 }, { scale: 1, duration: 7.5, ease: 'sine.out' });
+    return () => tween.kill();
+  }, [current, isMobile]);
 
   const slide = slides[current] || {};
 
@@ -105,30 +121,34 @@ export default function HeroSection() {
       ref={sectionRef}
       className="relative min-h-[100svh] overflow-hidden bg-[#050505] text-white"
     >
-      {/* Full-bleed media plane */}
       <div className="absolute inset-0">
-        {slides.map((item, index) => (
-          <div
-            key={item.img}
-            className={`absolute inset-0 transition-opacity duration-[1100ms] ease-out ${
-              index === current ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <img
-              src={item.img}
-              alt=""
-              className={`absolute inset-0 w-full h-full object-cover will-change-transform ${
-                index === current ? 'hero-media-active' : ''
+        {slides.map((item, index) => {
+          if (!loaded.has(index) && index !== current) return null;
+          return (
+            <div
+              key={item.id}
+              className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+                index === current ? 'opacity-100' : 'opacity-0'
               }`}
-              fetchPriority={index === 0 ? 'high' : 'auto'}
-              decoding="async"
-            />
-          </div>
-        ))}
+            >
+              <img
+                src={item.img}
+                alt=""
+                className={`absolute inset-0 w-full h-full object-cover ${
+                  index === current && !isMobile ? 'hero-media-active' : ''
+                }`}
+                fetchPriority={index === current ? 'high' : 'low'}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                sizes="100vw"
+              />
+            </div>
+          );
+        })}
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/78 to-black/35" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/45" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050505] to-transparent" />
-        <div className="pointer-events-none absolute -top-24 start-1/4 w-[42vw] h-[42vw] rounded-full bg-[#C63637]/20 blur-[140px]" />
+        <div className="pointer-events-none absolute -top-24 start-1/4 w-[42vw] h-[42vw] rounded-full bg-[#C63637]/15 blur-3xl md:blur-[140px] hidden sm:block" />
       </div>
 
       <div className="relative z-10 min-h-[100svh] flex flex-col justify-end pt-28 sm:pt-32 pb-10 sm:pb-14">
@@ -163,7 +183,7 @@ export default function HeroSection() {
                 </Link>
                 <Link
                   to="/quote"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/5 backdrop-blur-md px-7 py-3.5 sm:py-4 text-sm sm:text-base font-bold hover:bg-white/10 hover:border-white/40 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 sm:bg-white/5 sm:backdrop-blur-md px-7 py-3.5 sm:py-4 text-sm sm:text-base font-bold hover:bg-white/10 hover:border-white/40 transition-colors"
                 >
                   {t('site.hero.learnMore')}
                   <FiArrowUpRight />

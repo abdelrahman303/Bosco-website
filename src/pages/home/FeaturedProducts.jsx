@@ -21,9 +21,30 @@ export default function SolutionsSection() {
   const sectionRef = useRef(null);
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray('.bosco-stack-card');
+    const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.bosco-stack-head > *',
+        { y: 40 },
+        {
+          y: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 78%',
+            once: true,
+          },
+        }
+      );
+
+      // Sticky scrub stacks are heavy on mobile GPUs — keep static cards there.
+      if (isMobile || reduceMotion) return;
+
+      const cards = gsap.utils.toArray('.bosco-stack-card');
       cards.forEach((card, index) => {
         const inner = card.querySelector('.bosco-stack-inner');
         const dim = card.querySelector('.bosco-stack-dim');
@@ -52,22 +73,6 @@ export default function SolutionsSection() {
           });
         }
       });
-
-      gsap.fromTo(
-        '.bosco-stack-head > *',
-        { y: 40 },
-        {
-          y: 0,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 78%',
-            once: true,
-          },
-        }
-      );
     }, sectionRef);
 
     const refresh = () => ScrollTrigger.refresh();
@@ -103,13 +108,15 @@ export default function SolutionsSection() {
           {stackCards.map((card, index) => (
             <article
               key={card.id}
-              className="bosco-stack-card sticky top-24 mb-6 last:mb-0"
+              className="bosco-stack-card relative mb-6 last:mb-0 md:sticky md:top-24"
               style={{ zIndex: index + 1 }}
             >
-              <div className="bosco-stack-inner relative h-[min(72vh,700px)] min-h-[420px] sm:min-h-[480px] rounded-[1.6rem] sm:rounded-[2rem] lg:rounded-[2.6rem] overflow-hidden border border-white/10 shadow-[0_24px_50px_-28px_rgba(0,0,0,0.4)] origin-center bg-[#2a2a2a] will-change-transform">
+              <div className={`bosco-stack-inner relative h-[min(72vh,700px)] min-h-[420px] sm:min-h-[480px] rounded-[1.6rem] sm:rounded-[2rem] lg:rounded-[2.6rem] overflow-hidden border border-white/10 shadow-[0_24px_50px_-28px_rgba(0,0,0,0.4)] origin-center bg-[#2a2a2a] md:will-change-transform`}>
                 <img
-                  src={card.image}
+                  src={card.image.replace(/w=\d+/, 'w=1100')}
                   alt={card.title}
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
