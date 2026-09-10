@@ -28,9 +28,8 @@ jobs:
       - run: npm run build
         env:
           GITHUB_PAGES: 'true'
+          # Static catalog only — admin/API run on your real server or locally via npm run dev
           VITE_STATIC_API: 'true'
-          # Live API for admin login / dashboard (public catalog still uses static JSON)
-          VITE_API_URL: ${{ vars.VITE_API_URL || secrets.VITE_API_URL }}
       - name: Add SPA fallback
         run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3

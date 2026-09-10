@@ -5,9 +5,8 @@ import { DatabaseSync } from 'node:sqlite';
 import bcrypt from 'bcryptjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const isServerless = Boolean(process.env.VERCEL);
-const dataDir = isServerless ? path.join('/tmp', 'bosco-data') : path.join(__dirname, 'data');
-const uploadDir = isServerless ? path.join('/tmp', 'bosco-uploads') : path.join(__dirname, 'uploads');
+const dataDir = path.join(__dirname, 'data');
+const uploadDir = path.join(__dirname, 'uploads');
 
 fs.mkdirSync(dataDir, { recursive: true });
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -15,7 +14,7 @@ fs.mkdirSync(uploadDir, { recursive: true });
 export const UPLOAD_DIR = uploadDir;
 
 const db = new DatabaseSync(path.join(dataDir, 'bosco.db'));
-if (!isServerless) db.exec('PRAGMA journal_mode = WAL');
+db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
 
 db.exec(`
@@ -463,17 +462,12 @@ export function similarProducts(product, limit = 4) {
 function seed() {
   const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD || '';
-  const isServerless = Boolean(process.env.VERCEL);
 
   if (email && password) {
     const existingAdmin = queries.adminByEmail.get(email);
-    const hash = bcrypt.hashSync(password, 12);
     if (!existingAdmin) {
-      queries.insertAdmin.run(email, hash, 'Bosco Admin');
+      queries.insertAdmin.run(email, bcrypt.hashSync(password, 12), 'Bosco Admin');
       console.log(`Seeded admin from env: ${email}`);
-    } else if (isServerless) {
-      // Ephemeral /tmp DB can keep a stale hash across warm instances — keep in sync with env.
-      db.prepare('UPDATE admins SET password_hash = ? WHERE id = ?').run(hash, existingAdmin.id);
     }
   } else {
     const adminCount = db.prepare('SELECT COUNT(*) AS count FROM admins').get().count;
