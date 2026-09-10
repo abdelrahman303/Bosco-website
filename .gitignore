@@ -29,3 +29,7 @@ server/uploads/*
 *.sln
 *.sw?
 .vercel
+.vercel-*.txt
+.env
+.env.*
+!.env.example

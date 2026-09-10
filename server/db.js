@@ -463,12 +463,17 @@ export function similarProducts(product, limit = 4) {
 function seed() {
   const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const password = process.env.ADMIN_PASSWORD || '';
+  const isServerless = Boolean(process.env.VERCEL);
 
   if (email && password) {
     const existingAdmin = queries.adminByEmail.get(email);
+    const hash = bcrypt.hashSync(password, 12);
     if (!existingAdmin) {
-      queries.insertAdmin.run(email, bcrypt.hashSync(password, 12), 'Bosco Admin');
+      queries.insertAdmin.run(email, hash, 'Bosco Admin');
       console.log(`Seeded admin from env: ${email}`);
+    } else if (isServerless) {
+      // Ephemeral /tmp DB can keep a stale hash across warm instances — keep in sync with env.
+      db.prepare('UPDATE admins SET password_hash = ? WHERE id = ?').run(hash, existingAdmin.id);
     }
   } else {
     const adminCount = db.prepare('SELECT COUNT(*) AS count FROM admins').get().count;

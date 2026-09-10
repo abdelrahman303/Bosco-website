@@ -1,12 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "echo skip-frontend-build",
   "installCommand": "npm ci",
-  "env": {
-    "NODE_OPTIONS": "--experimental-sqlite"
-  },
+  "buildCommand": "mkdir -p .vercel-static && echo bosco-api > .vercel-static/ok.txt",
+  "outputDirectory": ".vercel-static",
   "rewrites": [
-    { "source": "/uploads/:path*", "destination": "/api/uploads/:path*" }
+    { "source": "/uploads/:path*", "destination": "/api/uploads/:path*" },
+    { "source": "/api/(.*)", "destination": "/api" }
   ]
 }
