@@ -21,7 +21,6 @@ export default function SolutionsSection() {
   const sectionRef = useRef(null);
 
   useLayoutEffect(() => {
-    const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const ctx = gsap.context(() => {
@@ -41,8 +40,7 @@ export default function SolutionsSection() {
         }
       );
 
-      // Sticky scrub stacks are heavy on mobile GPUs — keep static cards there.
-      if (isMobile || reduceMotion) return;
+      if (reduceMotion) return;
 
       const cards = gsap.utils.toArray('.bosco-stack-card');
       cards.forEach((card, index) => {
@@ -59,8 +57,8 @@ export default function SolutionsSection() {
         };
 
         gsap.to(inner, {
-          scale: 0.9,
-          y: 20,
+          scale: 0.92,
+          y: 16,
           ease: 'none',
           scrollTrigger: scrub,
         });
@@ -108,10 +106,10 @@ export default function SolutionsSection() {
           {stackCards.map((card, index) => (
             <article
               key={card.id}
-              className="bosco-stack-card relative mb-6 last:mb-0 md:sticky md:top-24"
+              className="bosco-stack-card sticky top-20 sm:top-24 mb-6 last:mb-0"
               style={{ zIndex: index + 1 }}
             >
-              <div className={`bosco-stack-inner relative h-[min(72vh,700px)] min-h-[420px] sm:min-h-[480px] rounded-[1.6rem] sm:rounded-[2rem] lg:rounded-[2.6rem] overflow-hidden border border-white/10 shadow-[0_24px_50px_-28px_rgba(0,0,0,0.4)] origin-center bg-[#2a2a2a] md:will-change-transform`}>
+              <div className="bosco-stack-inner relative h-[min(72vh,700px)] min-h-[420px] sm:min-h-[480px] rounded-[1.6rem] sm:rounded-[2rem] lg:rounded-[2.6rem] overflow-hidden border border-white/10 shadow-[0_24px_50px_-28px_rgba(0,0,0,0.4)] origin-center bg-[#2a2a2a] will-change-transform">
                 <img
                   src={card.image.replace(/w=\d+/, 'w=1100')}
                   alt={card.title}
