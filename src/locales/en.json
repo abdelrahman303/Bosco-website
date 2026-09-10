@@ -18,6 +18,8 @@
     "signIn": "Sign in",
     "signingIn": "Signing in...",
     "welcome": "Welcome back to Bosco Admin",
+    "needsLiveApi": "Admin login needs a live API server.",
+    "needsLiveApiHint": "GitHub Pages only hosts the public site. For admin, run npm run dev locally, or deploy the API (Render/Vercel) and set the VITE_API_URL GitHub variable.",
     "logout": "Logout",
     "viewSite": "View site",
     "overview": "Overview",

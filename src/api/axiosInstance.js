@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL, REFRESH_TOKEN_KEY, TOKEN_KEY } from './config';
-import { STATIC_API, staticApiAdapter } from './staticAdapter';
+import { STATIC_API, LIVE_API_URL, staticApiAdapter } from './staticAdapter';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -21,7 +21,8 @@ async function refreshAccessToken() {
     throw new Error('Missing refresh token');
   }
 
-  const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+  const base = LIVE_API_URL || API_BASE_URL;
+  const { data } = await axios.post(`${base}/auth/refresh`, { refreshToken });
   const accessToken = data.accessToken || data.token;
   if (!accessToken || !data.refreshToken) {
     throw new Error('Invalid refresh response');
@@ -58,7 +59,7 @@ axiosInstance.interceptors.response.use(
       url.includes('/auth/refresh') ||
       url.includes('/auth/logout');
 
-    if (status === 401 && original && !original._retry && !isAuthRoute && !STATIC_API) {
+    if (status === 401 && original && !original._retry && !isAuthRoute && (!STATIC_API || LIVE_API_URL)) {
       original._retry = true;
       try {
         refreshPromise = refreshPromise || refreshAccessToken().finally(() => {

@@ -18,6 +18,8 @@
     "signIn": "تسجيل الدخول",
     "signingIn": "جاري الدخول...",
     "welcome": "مرحباً بعودتك إلى بوسكو",
+    "needsLiveApi": "تسجيل دخول الأدمن يحتاج خادم API مباشر.",
+    "needsLiveApiHint": "GitHub Pages يعرض الموقع العام فقط. للأدمن شغّل npm run dev محلياً، أو انشر الـ API (Render/Vercel) واضبط متغير VITE_API_URL في GitHub.",
     "logout": "خروج",
     "viewSite": "عرض الموقع",
     "overview": "نظرة عامة",

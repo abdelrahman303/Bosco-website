@@ -7,6 +7,7 @@ import ThemeLangToggles from '../../components/admin/ThemeLangToggles';
 import Logo from '../../components/Logo';
 import useAuth from '../../hooks/useAuth';
 import useTheme from '../../hooks/useTheme';
+import { LIVE_API_URL, STATIC_API } from '../../api/staticAdapter';
 
 export default function AdminLogin() {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const needsLiveApi = STATIC_API && !LIVE_API_URL;
 
   if (!loading && isAuthenticated) {
     return <Navigate to="/admin" replace />;
@@ -24,6 +26,10 @@ export default function AdminLogin() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (needsLiveApi) {
+      toast.error(t('admin.needsLiveApi'));
+      return;
+    }
     setSubmitting(true);
     try {
       await login(email, password);
@@ -39,7 +45,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-8 sm:py-10 bg-[#f3f1ec] dark:bg-[#080808] text-gray-900 dark:text-white transition-colors">
       <img
-        src="https://images.unsplash.com/photo-1581092335397-9583eb92d232?q=80&w=2070&auto=format&fit=crop"
+        src="https://images.unsplash.com/photo-1581092335397-9583eb92d232?q=80&w=1200&auto=format&fit=crop"
         alt=""
         className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
           isDark ? 'opacity-30' : 'opacity-20'
@@ -67,6 +73,12 @@ export default function AdminLogin() {
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{t('admin.loginSubtitle')}</p>
         </div>
+
+        {needsLiveApi ? (
+          <div className="mb-5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-100">
+            {t('admin.needsLiveApiHint')}
+          </div>
+        ) : null}
 
         <form
           onSubmit={handleSubmit}
@@ -106,7 +118,7 @@ export default function AdminLogin() {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || needsLiveApi}
             className="w-full group flex items-center justify-center gap-2 bg-[#C63637] hover:bg-red-700 disabled:opacity-60 text-white py-3.5 rounded-2xl font-bold transition-colors"
           >
             {submitting ? t('admin.signingIn') : t('admin.signIn')}

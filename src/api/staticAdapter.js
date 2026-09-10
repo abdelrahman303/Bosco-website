@@ -1,5 +1,8 @@
+import axios from 'axios';
+
 const STATIC_API = import.meta.env.VITE_STATIC_API === 'true';
-const INQUIRY_EMAIL = 'rana.fathi.rana@gmail.com';
+const LIVE_API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const INQUIRY_EMAIL = 'bosco.intertrade@outlook.com';
 
 let catalogPromise;
 
@@ -46,6 +49,19 @@ function ok(data, status = 200) {
   };
 }
 
+function isPublicRead(path, method) {
+  if (method !== 'get') return false;
+  return (
+    path === 'health' ||
+    path === 'products' ||
+    path.startsWith('products/') ||
+    path === 'categories' ||
+    path.startsWith('categories/') ||
+    path === 'subcategories' ||
+    path.startsWith('subcategories/')
+  );
+}
+
 async function sendInquiry(payload = {}) {
   const name = String(payload.name || '').trim();
   const email = String(payload.email || '').trim();
@@ -77,16 +93,50 @@ async function sendInquiry(payload = {}) {
     throw new Error('Could not send the inquiry. Please email us directly.');
   }
 
-  return ok({
-    ok: true,
-    message: 'Your inquiry has been received. Our team will contact you shortly.',
-  }, 201);
+  return ok(
+    {
+      ok: true,
+      message: 'Your inquiry has been received. Our team will contact you shortly.',
+    },
+    201
+  );
+}
+
+async function forwardToLiveApi(config) {
+  if (!LIVE_API_URL) {
+    const error = new Error(
+      'Admin login needs a live API. Use localhost (npm run dev), or deploy the API and set VITE_API_URL.'
+    );
+    error.response = { status: 503, data: { message: error.message } };
+    throw error;
+  }
+
+  const adapter = axios.getAdapter(['xhr', 'http', 'fetch']);
+  return adapter({
+    ...config,
+    baseURL: LIVE_API_URL,
+    adapter: undefined,
+  });
 }
 
 export async function staticApiAdapter(config) {
   const method = (config.method || 'get').toLowerCase();
   const path = String(config.url || '').split('?')[0].replace(/^\//, '');
   const params = config.params || {};
+
+  // Auth + admin mutations always need the live server when available.
+  if (!isPublicRead(path, method) && path !== 'inquiries') {
+    return forwardToLiveApi(config);
+  }
+
+  if (path === 'inquiries' && method === 'post' && LIVE_API_URL) {
+    try {
+      return await forwardToLiveApi(config);
+    } catch {
+      /* fall back to FormSubmit below */
+    }
+  }
+
   const catalog = await loadCatalog();
 
   if (path === 'health' && method === 'get') return ok(catalog.health);
@@ -151,9 +201,7 @@ export async function staticApiAdapter(config) {
     return sendInquiry(payload);
   }
 
-  const error = new Error('This action needs a live admin server. The public catalog is already live on GitHub Pages.');
-  error.response = { status: 503, data: { message: error.message } };
-  throw error;
+  return forwardToLiveApi(config);
 }
 
-export { STATIC_API };
+export { STATIC_API, LIVE_API_URL };
